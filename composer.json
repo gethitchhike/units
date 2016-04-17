@@ -1,0 +1,16 @@
+{
+    "name": "gethitchhike/units",
+    "type": "library",
+    "description": "Units repo",
+    "keywords": ["hitchhike"],
+    "homepage": "https://github.com/gethitchhike/units/",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "squarerootfury",
+            "email": "fury224@googlemail.com",
+            "homepage": "https://0fury.de",
+            "role": "Developer"
+        }
+    ]
+}
