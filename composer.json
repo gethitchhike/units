@@ -1,9 +1,13 @@
 {
     "name": "gethitchhike/units",
     "type": "library",
-    "description": "Units repo",
-    "keywords": ["hitchhike"],
+    "description": "Hitchhike repo",
+    "keywords": ["php","hitchhike"],
     "homepage": "https://github.com/gethitchhike/units/",
+    "support": {
+    "issues": "https://github.com/gethitchhike/units/issues",
+    "docs": "https://github.com/gethitchhike/units/docs"
+    },
     "license": "proprietary",
     "authors": [
         {
