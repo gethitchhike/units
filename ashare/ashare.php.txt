@@ -1,0 +1,34 @@
+<?php
+
+class AShare implements IPostUnit{
+    public function GetFiles(){
+        return array("ashare.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Hyperlink social media unit";
+    }
+    public function Run(){
+      global $blog;
+      global $bootstrap;
+      $parsedown = new \Parsedown();
+      global $post;
+      $socialMedia = array(
+          "fa fa-twitter" => "https://twitter.com/home?status=%s",
+          "fa fa-facebook" => "https://www.facebook.com/sharer/sharer.php?u=%s",
+          "fa fa-google-plus" => "https://plus.google.com/share?url=%s",
+          "fa fa-envelope" => "mailto:?&body=%s"
+      );
+      echo "<ul class=\"social\">";
+      foreach($socialMedia as $key => $value){
+        $href = sprintf($value,urlencode($blog->URL."?/post/".$post->WebFilename."/"));
+          echo "<li><a href='".$href."'><i class='".$key."'></i></a></li>";
+      }
+      echo "</ul>";
+    }
+}

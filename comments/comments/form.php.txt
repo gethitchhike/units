@@ -1,0 +1,56 @@
+<hr>
+<?php global $translation;?>
+<?php foreach($comments as $value):?>
+  <div>
+    <?php echo $value["author"];?>, <?php echo date("d.m.Y H:i:s",$value["timestamp"]);?>
+    <blockquote><?php echo $value["message"];?></blockquote>
+  </div>
+<?php endforeach;?>
+<form method="post" action="" name="commentform">
+  <div class="row">
+    <div class="">
+      <label for="name">Name</label>
+      <input class="u-full-width" type="text"  name="name" required="" id="name">
+    </div>
+  </div>
+  <label for="comment">Text</label>
+  <textarea class="u-full-width"  name="comment" id ="comment" required=""></textarea>
+  <p>
+    <?php echo $translation["commentbindings"];?>
+  </p>
+  <p class="spam"><?php 
+  		if (__KEEPCONNECTIONSLOCAL__ === "false"){
+	  		echo $translation["stopforumspam"];
+  		}
+  ?></p>
+  <input class="button-primary" type="submit">
+</form>
+<script>
+  //Store the user name for future comments
+  if (typeof(Storage) !== "undefined"){
+       var userName = document.getElementById("name").value;
+       var stored = (localStorage.getItem("comments.userName") !== null);
+       if (stored){
+          document.getElementById("name").value = localStorage.getItem("comments.userName");
+       }
+       document.getElementById("name").addEventListener("change",saveName);
+       function saveName(){
+         localStorage.setItem("comments.userName",document.getElementById("name").value);
+       }
+  }
+  var commentbox = document.getElementById("comment");
+  //Jump to comment box
+  document.addEventListener('keydown', function(event) {      
+    if (document.activeElement.name !== "comment" && event.which === 67) {
+       event.preventDefault();
+       commentbox.focus();
+    }    
+  });
+  //Comment submit with ALT+Enter
+  
+  commentbox.addEventListener('keydown', function(event) {  
+    if (event.altKey && event.which === 13) {
+        document.forms.commentform.submit();
+    }    
+  });
+</script>

@@ -1,0 +1,80 @@
+<?php
+class Comments implements IPostUnit{
+    public function GetFiles(){
+        return array("comments.php","comments/form.php","comments/comments.db");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Comments Unit";
+    }
+    private function IsSpam($content,$author){
+      //name strange
+      if (preg_match("/[A-Za-z0-9\s.]+/",$author) == 0){
+          return true;
+      }
+      //no tags are allowed
+      $stripped = strip_tags($content) !== $content;
+      //stop forum spam
+      if (__KEEPCONNECTIONSLOCAL__ === "false"){
+        $isSpammer = false;
+      }
+      else{
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $got = file_get_contents("http://api.stopforumspam.org/api?ip=".$ip."&username=".$author); 
+        $isSpammer = strpos($got, "yes") >0;
+      }
+      return $stripped ||  $isSpammer;
+    }
+    public function Run(){
+      global $php;
+      global $post;
+      global $blog;
+      $db = new PDO('sqlite:'.__DIR__."/comments/comments.db");
+      $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      //$db->exec("Drop table comments");
+      $db->exec("CREATE TABLE IF NOT EXISTS comments (
+                      id INTEGER PRIMARY KEY, 
+                      author TEXT, 
+                      message TEXT, 
+                      post TEXT,
+                      timestamp INTEGER)");
+      if (!is_array($php->post)){
+          $author = $php->post->name;
+          $message = $php->post->comment;
+          $isSpam = $this->IsSpam($message,$author);
+          if (!$isSpam && !empty($author) && !empty($message)){
+            $insert = "INSERT INTO comments (author, message,post, timestamp) 
+                        VALUES (:author, :message, :post, :timestamp)";
+            $stmt = $db->prepare($insert);
+         
+            // Bind parameters to statement variables
+            $stmt->bindParam(':author', $author);
+            $stmt->bindParam(':message', $message);
+            $stmt->bindParam(':post',$php->get->post);
+            $stmt->bindParam(':timestamp', time());
+            $stmt->execute();
+            if (property_exists($post->Author,"Email") && !empty($post->Author->Email)){
+              $content = sprintf("New comment by %s on %s:\n\n\"%s\"",$author,$blog->URL."index.php?/post&post=".$php->get->post,$message);
+              mail ($post->Author->Email , $blog->Name.": Comment" , $content );
+            }
+          }else{
+            echo "Error!";
+          }
+      }
+      //current comments
+      $query = "SELECT * FROM comments where post = :postname order by timestamp desc";
+      $stmt = $db->prepare($query);
+      $stmt->bindParam(':postname', $php->get->post); 
+      $stmt->execute();
+      $comments = $stmt->fetchAll();
+
+      require_once __DIR__."/comments/form.php";
+      $db = null; 
+       
+    }
+}

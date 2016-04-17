@@ -1,0 +1,51 @@
+<?php
+class TwitterCards implements IHeadUnit{
+    public function GetFiles(){
+        return array("twittercards.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+    	return "0.1";
+    }
+	public function GetName(){
+		return "Twitter Cards ";
+	}
+    public function Run(){
+        global $blog;
+        $post = null;
+        global $bootstrap;
+        if (isset($_GET["post"])){
+        	 $parsedown = new \Parsedown();
+	        $unit = $bootstrap->GetUnit("Posts");
+	        $posts = $unit->Run();
+	        $needle = $_GET["post"];
+	        $post = null;
+	        $posts = array_filter($posts,function($p) use($needle){
+	        	return $p->Filename === $needle;
+	        });
+	        $post = array_shift($posts);
+	        $tags = array(
+	            "card" => "summary",
+	            "description" =>  str_replace("'","\"", \BTRString::SubStrClause(strip_tags($parsedown->text($post->Content)),2,true)),
+	            "title" => $post->Title,
+	            "image" => $blog->Authors[0]->Avatar,
+	            "url" => $blog->URL. "index.php?/post/&post=".urlencode($_GET["post"])
+	        );
+        }
+        else{
+        	$tags = array(
+	            "card" => "summary",
+	            "description" =>  str_replace("'","\"",$blog->Description),
+	            "title" => urlencode($blog->Name),
+	            "image" => $blog->Authors[0]->Avatar,
+	            "url" => $blog->URL
+	        );
+        }
+       
+        foreach($tags as $key => $value){
+            echo "<meta name='twitter:".$key."' value='".$value."'>\n";
+        }
+    }
+}

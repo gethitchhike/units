@@ -1,0 +1,107 @@
+<?php
+
+class Backend implements IPreUnit{
+    public function GetFiles(){
+        return array("backend.php");
+    }
+    public function Requires(){
+        return array("Posts");
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Backend unit";
+    }
+    public function Run(){
+        global $router;
+        session_start();
+        $router->Route("/backend/",function($php){
+            global $blog;
+            if (!isset($php->session->user)){
+                header("Location: index.php?/login/");
+            }
+            else{
+                $p = new Posts();
+                $posts = $p->Run();
+                require __DIR__."/backend/backend.php";
+            }
+        }); 
+        $router->Route("/login/",function($php){
+            if (!empty($php->post)){
+               $auth = $this->Auth($php->post->email,$php->post->password);
+               if (!is_null($auth)){
+                   $_SESSION["user"] = $auth;
+                   header("Location: index.php?/backend/");
+               }
+            }
+            require __DIR__."/backend/login.php";
+        });
+        $router->Route("/logout/",function($php){
+            $_SESSION = array();
+            session_destroy();
+            header("Location: index.php");
+        });
+        $router->Route("/editor/",function($php){
+            $p = new Posts();
+            $posts = $p->Run();
+            $filtered = array_filter($posts,function($p) use ($php){
+                $r =  $p->Filename === $php->get->post;
+                return $r;
+            }); 
+            if (count($filtered) != 1){
+                //404
+            }
+            $post = array_shift($filtered);
+            if (!empty($php->post)){
+                $content = "# ". $post->Title;
+                $content .= "\n". $php->post->content;
+                $path = dirname(__DIR__)."/content/".$post->Filename;
+                $length = file_put_contents($path, $content);  
+                $post->Content = $content;         
+            }
+            $posts = $p->Run();
+            $filtered = array_filter($posts,function($p) use ($php){
+                $r =  $p->Filename === $php->get->post;
+                return $r;
+            }); 
+            if (count($filtered) != 1){
+                //404
+            }
+            $post = array_shift($filtered);
+            require __DIR__."/backend/editor.php";
+        });
+        $router->Route("/delete/",function($php){
+            $p = new Posts();
+            $posts = $p->Run();
+            $filtered = array_filter($posts,function($p) use ($php){
+                return $p->Filename === $php->get->post;
+            }); 
+            if (count($filtered) != 1){
+                //404
+            }
+            $post = array_shift($filtered);
+            $path = dirname(__DIR__)."/content/".$post->Filename;
+            if (file_exists($path)){
+                unlink($path);
+            }
+            //TODO: Feedback
+            header("Location: index.php?/backend/");
+        });
+    }
+    private function Auth($email,$password){
+        global $blog;
+        if (count($blog->Authors) !== 0){
+            foreach($blog->Authors as $author){
+                if ($author->Email === $email && property_exists($author,"Password")){
+                    $result = password_verify($password,$author->Password);
+                    if ($result){
+                        return $author;
+                    }
+                    break;
+                }
+            }
+        }
+        return null;
+    }
+}

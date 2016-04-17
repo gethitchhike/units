@@ -1,0 +1,19 @@
+<?php
+class https implements IPreUnit{
+    public function GetFiles(){
+        return array("https.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+    	return "0.1";
+    }
+	public function GetName(){
+		return "https redirect";
+	}
+    public function Run(){
+        header('Location: https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], true, 301);
+        die();  
+    }
+}

@@ -1,0 +1,37 @@
+<?php
+class Bouncer implements IPreUnit{
+    public function GetFiles(){
+        return array("bouncer.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Bouncer";
+    }
+    public function Run(){
+        $path = __CONTENTPATH__."bouncer.json";
+        $content = "{\"HTTP_USER_AGENT\":\"\"}";
+        if (!file_exists($path)){
+            $data = new \stdClass();
+            foreach($_SERVER as $key => $value){
+                $data->{$key} = "";
+            }
+            file_put_contents($path,json_encode($data));
+        }
+        $bouncer =json_decode(file_get_contents($path));
+        foreach($bouncer as $key => $value){
+            if (isset($_SERVER[$key])){
+
+                if (!empty($value) && preg_match_all($value,$_SERVER[$key])){
+                    http_response_code(403);
+                    exit;
+                }
+            }
+        }
+        
+    }
+}
