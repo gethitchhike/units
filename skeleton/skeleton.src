@@ -4,7 +4,7 @@ class Skeleton implements IPreUnit{
     private $theme ="simple";
     public function __construct(){
         global $blog;
-        if (property_exists($blog,"Theme")){
+        if (!is_null($blog) && property_exists($blog,"Theme")){
             $this->theme = $blog->Theme;
         }
     }
@@ -15,7 +15,7 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-    	return "0.2";
+    	return "0.2.1";
     }
 	public function GetName(){
 		return "Skeleton";
