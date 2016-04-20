@@ -1,0 +1,111 @@
+<?php
+class Post{
+	public $Title;
+	public function GetSlug(){
+		return str_replace(array("."),array(""),$this->Title);
+	}
+	public $Filename;
+    public $WebFilename;
+	public $Content;
+    public $Date;
+    public $Author;
+    public $Image;
+    public $Tags;
+    public $Hidden;
+}
+class Posts implements IOnDemandUNit{
+    public function GetFiles(){
+        return array("posts.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+    	return "0.1";
+    }
+	public function GetName(){
+		return "Posts";
+	}
+    public function Run($filter = ".md"){
+        global $blog;
+    	$files = array_filter(scandir(__CONTENTPATH__),function($f) use ($filter){
+    		return \BTRString::EndsWith($f,$filter,true);
+    	});
+    	$posts = array();
+    	foreach($files as $file){
+    		$content =  file_get_contents(__CONTENTPATH__."/".$file);
+    		$post = new \Post();
+
+    		
+    		$post->Title = $this->GetPostTitle($content,$file);
+
+    		$post->Content =$this->GetPostContent($content);
+            $matches = array();
+            //Set post date
+            if (preg_match("/~date\((?<date>[^)]+)\)/",$post->Content,$matches)){
+                $date = $matches["date"];
+                $post->Date = strtotime($date);
+                $post->Content = str_replace($matches[0],"",$post->Content);
+
+            }
+            else{
+                $post->Date = filectime(__CONTENTPATH__."/".$file);
+            }
+            $matches = array();
+            //set post image
+            if (preg_match("/~image\((?<image>[^)]+)\)/",$post->Content,$matches)){
+                $path = $matches["image"];
+                $post->Image = $path;
+                $post->Content = str_replace($matches[0],"",$post->Content);
+            }
+            //Get Author
+            foreach($blog->Authors as $author){
+                if (\BTRString::Contains($post->Content,$author->Signature,true)){
+                    $post->Author = $author;
+                    $post->Content = str_replace($author->Signature,"",$post->Content);
+                    break;
+                }
+            }
+            $propertyPattern = "/~hidden/";
+            $matches = array();
+            $found = preg_match($propertyPattern,$post->Content);
+            $post->Hidden = $found == 1;  
+            $post->Content = str_replace("~hidden","",$post->Content);  
+            //Set other tags
+            $tagsPattern = "/~(?<tag>[a-zA-Z0-9]+)/";
+            $matches = array();
+            preg_match_all($tagsPattern,$post->Content,$matches);
+            $post->Tags =array();
+            foreach($matches["tag"] as $match){
+                if (!empty($match)){
+                    $post->Content = str_replace("~".$match,"",$post->Content);
+                    $post->Tags[] = $match;
+                }
+            }
+            if (is_null($post->Author)){
+                $post->Author = $blog->Authors[0];
+            }
+            $post->Filename = $file;
+            $post->WebFilename = urlencode(str_replace(array(".smd",".md"), "", $file));
+    		$posts[] = $post;
+    	}
+        usort($posts,function($a,$b){
+            return  ($a->Date < $b->Date) ? 1 : -1;
+        });
+    	return  $posts;
+    }
+    private function GetPostTitle($content,$filename){
+    	$lines = explode("\n",$content);
+    	
+    	if (count($lines) == 0 || !\BTRString::StartsWith($lines[0],"#",true)){
+    		return $filename;
+    	}
+    	else{
+    		return trim(str_replace("#","",$lines[0]));
+    	}
+    }
+    private function GetPostContent($content){
+    	$lines = explode("\n",$content);
+    	return str_replace($lines[0],"",$content);
+    }
+}

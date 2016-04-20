@@ -1,0 +1,28 @@
+<?php
+class Meta implements IHeadUnit{
+    public function GetFiles(){
+        return array("meta.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+    	return "0.1";
+    }
+	public function GetName(){
+		return "Head meta tags";
+	}
+    public function Run(){
+        global $blog;
+        global $post;
+        $Parsedown = new \Parsedown();
+        $description  = is_null($post) ? (!empty($blog->Description) ? $blog->Description : "") : \BTRString::SubStrClause(strip_tags($Parsedown->text($post->Content)),2,true)."...";
+        $tags = array(
+            "generator" => __CAMOUFLAGE__ === "true" ? "WordPress 4.5" : "Hitchhike 3",
+            "description" => $description
+        );
+        foreach($tags as $key => $value){
+            echo "<meta name='".$key."' value='".$value."'>\n";
+        }
+    }
+}

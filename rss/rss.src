@@ -1,0 +1,63 @@
+<?php
+
+class RSS implements IPreUnit{
+    public function GetFiles(){
+        return array("rss.php");
+    }
+    public function Requires(){
+        return array("Posts");
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "RSS Unit";
+    }
+    public function Run(){
+        global $router;
+
+        $router->Route("/feed/",function($php){
+            global $blog;
+            header("Content-type: text/xml");
+            $feed = new \Suin\RSSWriter\Feed();
+            $channel = new \Suin\RSSWriter\Channel();
+            $channel
+                    ->title($blog->Name)
+                    ->description($blog->Subtitle)
+                    ->url($blog->URL)
+                    ->language($blog->Language)
+                    ->pubDate(time())
+                    ->lastBuildDate(time())
+                    ->ttl(60)
+                    ->appendTo($feed);
+            $Parsedown = new Parsedown();
+            $p = new Posts();
+            $posts = array_filter($p->Run(),function($p){
+                return !$p->Hidden;
+            });
+            $query = null;
+            if (isset($php->get->tag)){
+                $query = "~".strtolower($php->get->tag);
+            }
+            
+            if (!is_null($query)){
+                $posts = array_filter($posts,function($p) use ($php,$query){
+                    return \BTRString::Contains(strtolower($p->Title),$query) || \BTRString::Contains(strtolower($p->Content),$query) || in_array(str_replace("~","",$query), $p->Tags);
+                });
+
+            }
+            foreach ($posts as $entry) {
+                $item = new \Suin\RSSWriter\Item();
+                $item
+                        ->title($entry->Title)
+                        ->description($Parsedown->text($entry->Content))
+                        ->url($blog->URL."?/post/" . $entry->WebFilename."/")
+                        ->pubDate($entry->Date)
+                        ->guid($blog->URL."?/post/" . $entry->WebFilename."/", true)
+                        ->author($entry->Author->Email)
+                        ->appendTo($channel);
+            }
+            echo $feed;
+        },array("tag")); 
+    }
+}

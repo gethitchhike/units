@@ -1,0 +1,47 @@
+<?php
+class i18n implements IPreUnit{
+    public function GetFiles(){
+        return array("i18n.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+    	return "0.1";
+    }
+	public function GetName(){
+		return "Frontend Translation module";
+	}
+    public function Run(){
+        global $translation;
+        global $blog;
+
+        $de =  array(
+            "continuereading" => "Weiterlesen",
+            "about" => "Über",
+            "search" => "Suchen",
+            "nextpage" => "Nächste Seite",
+            "prevpage" => "Vorherige Seite",
+            "comments" => "Kommentare",
+            "stopforumspam" => "Zum Verhindern von SPAM wird dein Kommentar überprüft",
+            "commentbindings" => "Mit ALT+ENTER kannst Du den Kommentar abschicken."
+        );
+        $en = array(    
+            "continuereading" => "Continue reading",
+            "about" => "Über",
+            "search" => "Search",
+            "nextpage" => "Next Page",
+            "prevpage" => "Previous Page",
+            "comments" => "Comments",
+            "stopforumspam" => "Your Name and IP will be checked to avoid SPAM. No tags are allowed",
+             "commentbindings" => "ALT+ENTER submits your comment"
+        );
+        $vars = get_defined_vars();
+        if (!isset($vars[$blog->Language])){
+            $translation = $de;
+        }
+        else{
+            $translation =  $vars[$blog->Language];
+        }
+    }
+}
