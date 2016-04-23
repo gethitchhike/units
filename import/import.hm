@@ -1,0 +1,107 @@
+<?php
+use League\HTMLToMarkdown\HtmlConverter;
+$this->import = function(){
+	if ($this->args[1] == "help"){
+		return "Import from WordPress or hugo export xml\n";
+	}
+	$converter = new HtmlConverter();
+	if ($this->args[1] == "help"){
+		return "Import from other blog systems (WordPress, Hugo) \n";
+	}
+	if (!isset($this->args[2]) || !in_array($this->args[2],array("wordpress","hugo"))){
+		echo "\033[01;31mSource CMS not supported. Aborting. \033[0m \n";
+		return false;
+	}
+	$file = $this->args[3];
+	if (!file_exists($file)){
+		echo "\033[01;31mFile not exists. Aborting. \033[0m \n";
+		return false;
+	}
+	$posts = array();
+	if ($this->args[2] === "wordpress"){
+		$data = null;
+        $xml = null;
+        $fileContent = file_get_contents($file);
+        $trans = array(
+            'wp:' => 'wp_',
+            'content:encoded' => 'content_encoded'
+        );
+        $data = strtr($fileContent, $trans);
+        $xml = simplexml_load_string($data);
+
+        foreach ($xml->channel->item as $item) {
+            $content = $item->children('http://purl.org/rss/1.0/modules/content/');
+            $blogPost = (string) $item->content_encoded;
+            $blogPost = preg_replace("/\[[^\]]*\]/", "", $blogPost);
+            //TODO Image link correct
+            if ((string) $item->wp_post_type == "post") {
+
+                if (!empty($item->title)) {
+                	$date= $item->pubDate;
+                    $posts[] = array(
+                        "title" => str_replace("#", "", $item->title),
+                        "content" => $converter->convert($blogPost),
+                        "pubDate" => $date
+                    );
+                }
+            }
+        }
+	}else if ($this->args[2] == "hugo"){
+
+		$files = scandir($file);
+		$imagespath = $this->args[4];
+		$file = $this->args[3];
+		if (!file_exists($imagespath)){
+			echo "\033[01;31mImage path not exists. Aborting. \033[0m \n";
+			return false;
+		}
+		foreach($files as $filename){
+			if (strpos($filename,".md") !== false){
+				$content = file_get_contents($file.$filename);
+				$meta = array("title","date");
+				$metaGot = array();
+				foreach ($meta as  $value) {
+					$match = array();
+					$pattern = "/".$value."\s{0,}=\s{0,}\"(?<".$value.">[^\"]+)\"/";
+					preg_match($pattern,$content,$match);
+					if (isset($match[$value])){
+						$metaGot[$value] = $match[$value];
+					}
+					$realContent = trim(preg_replace("/\+\+\+[^\+]*\+\+\+/","",$content));
+					$realContent = str_replace("/images/","./content/images/",$realContent);
+					$posts[] = array(
+                        "title" => $metaGot["title"],
+                        "content" => $realContent,
+                        "pubDate" => $metaGot["date"]
+                    );
+				}
+			}
+		}
+		exec("cp -R ".$imagespath ." ./content/");
+	}
+
+    $failed = array();
+    $i = 0;
+    foreach($posts as $key => $value){
+
+    	$name = str_replace(array("/"), "", $value["title"]).".md";
+
+    	$content = "# ".$value["title"]."\n".$value["content"]."\n ~date(".$value["pubDate"].")";;
+    	$res = file_put_contents("./content/".$name, $content) !== false;
+    	if (!$res){
+    		$failed[] = $value;
+    	}
+    	else{
+    		echo "#".(++$i )." Imported ".$value["title"]." (".$value["pubDate"].")\n";
+    	}
+    }
+
+    if (count($failed) != 0) {
+    	foreach($failed as $key => $value){
+        	echo "Failed:  ".$value["title"]." (".$value["pubDate"].")\n";
+        }
+    }else{
+    	echo "All okay.\n";
+    }
+};
+$this->dynamicMethods[]= "import";
