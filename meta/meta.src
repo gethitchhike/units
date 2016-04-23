@@ -7,18 +7,18 @@ class Meta implements IHeadUnit{
         return array();
     }
     public function GetVersion(){
-    	return "0.1";
+        return "0.1.1";
     }
-	public function GetName(){
-		return "Head meta tags";
-	}
+    public function GetName(){
+        return "Head meta tags";
+    }
     public function Run(){
         global $blog;
         global $post;
         $Parsedown = new \Parsedown();
         $description  = is_null($post) ? (!empty($blog->Description) ? $blog->Description : "") : \BTRString::SubStrClause(strip_tags($Parsedown->text($post->Content)),2,true)."...";
         $tags = array(
-            "generator" => __CAMOUFLAGE__ === "true" ? "WordPress 4.5" : "Hitchhike 3",
+            "generator" => __CAMOUFLAGE__ === "true" ? "WordPress 4.5" : "Hitchhike ". __HVERSION__,
             "description" => $description
         );
         foreach($tags as $key => $value){
