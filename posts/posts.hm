@@ -1,0 +1,62 @@
+<?php
+$this->createpost = function(){
+	if ($this->args[1] == "help"){
+		return "Create a new post\n";
+	}
+	$name = isset($this->args[2]) ? $this->args[2].".md" : "new.md";
+	$content = file_get_contents("./new.md.sample");
+	$result = file_put_contents("./content/".$name,str_replace("# Sample blog post", "# ".$name, $content)) > 0;
+	if ($result){
+		$blog = json_decode(file_get_contents("./content/blog.json"));
+		echo urlencode($this->args[2]). " created\n";
+		echo "Post URL is ".$blog->URL."?/post/".urlencode($this->args[2])."/\n";
+		$this->sitemap();
+	}
+	else{
+		echo "\033[01;31mCould not create new post.\033[0\n";
+	}
+};
+$this->dynamicMethods[]= "createpost";
+$this->createsite = function(){
+	if ($this->args[1] == "help"){
+		return "Create a new site\n";
+	}
+	$name = isset($this->args[2]) ? $this->args[2].".smd" : "new.smd";
+	$content = file_get_contents("./new.md.sample");
+	$result = file_put_contents("./content/".$name,str_replace("# Sample blog post", "# ".$name, $content)) > 0;
+	if ($result){
+		$blog = json_decode(file_get_contents("./content/blog.json"));
+		echo urlencode($this->args[2]) . " created\n";
+		echo "Site URL is ".$blog->URL."?/post/".urlencode($this->args[2])."/\n";
+	}
+	else{
+		echo "\033[01;31mCould not create new site.\033[0\n";
+	}
+};
+$this->dynamicMethods[]= "createsite";
+$this->deletepost = function(){
+	if ($this->args[1] == "help"){
+		return "Delete post and update sitemap.\n";
+	}
+	$deletion = false;
+	if (!isset($this->args[2]) || !file_exists("./content/".$this->args[2])){
+		  echo "\033[01;31mFile was not found! \033[0m \n";
+			return false;
+	}
+	else{
+		$deletion = unlink("./content/".$this->args[2]);
+	}
+	if ($deletion){
+		echo "File deleted, updating sitemap.xml\n";
+		$this->sitemap();
+	}
+};
+$this->dynamicMethods[]= "deletepost";
+$this->deletesite = function(){
+	if ($this->args[1] == "help"){
+		return "Delete site and update sitemap.\n";
+	}
+	call_user_func_array(array($this,"deletepost"),array());
+};
+$this->dynamicMethods[]= "deletesite";
+

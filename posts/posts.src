@@ -15,13 +15,13 @@ class Post{
 }
 class Posts implements IOnDemandUNit{
     public function GetFiles(){
-        return array("posts.php");
+        return array("posts.php","posts.hm");
     }
     public function Requires(){
         return array();
     }
     public function GetVersion(){
-    	return "0.1";
+    	return "0.2";
     }
 	public function GetName(){
 		return "Posts";
