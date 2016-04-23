@@ -1,6 +1,6 @@
 <?php
 
-class AlphaTest implements IPreUnit{
+class Sitemap implements IPreUnit{
     public function GetFiles(){
         return array("sitemap.php","sitemap.hm");
     }
