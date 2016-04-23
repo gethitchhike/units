@@ -1,0 +1,26 @@
+<?php
+
+$this->sitemap = function(){
+	if ($this->args[1] == "help"){
+		return "Generate the sitemap.xml file\n";
+	}
+	global $blog;
+	$blog = json_decode(file_get_contents(__CONTENTPATH__."blog.json"));
+	$bootstrap = new \BTRBootStrap("./units/");
+	$skeleton = $bootstrap->GetUnitsByImplementation("IPreUnit")["Skeleton"];
+	if (file_exists("./sitemap.xml")){
+		unlink("./sitemap.xml");
+	}
+	else{
+		echo "Warning: No old sitemap.\n";
+	}
+	$result = $skeleton->CreateSitemapIfNeeded();
+	if ($result){
+		$lines = file("./sitemap.xml");
+		echo "Sitemap generated. \n";
+	}
+	else{
+		 echo "\033[01;31mCould not create sitemap. Aborting. \033[0m \n";
+	}
+};
+$this->dynamicMethods[]= "sitemap";
