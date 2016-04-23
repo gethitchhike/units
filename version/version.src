@@ -1,0 +1,19 @@
+<?php
+
+class Version implements IPreUnit{
+    public function GetFiles(){
+        return array("version.php","version.hm");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.3";
+    }
+    public function GetName(){
+        return "Version String module. Please note: The hm.php version is not equal the Hitchhike version!";
+    }
+    public function Run(){
+        define("__HVERSION__",$this->GetVersion());
+    }
+}
