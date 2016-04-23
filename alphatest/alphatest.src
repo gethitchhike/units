@@ -2,13 +2,13 @@
 
 class AlphaTest implements IPreUnit{
     public function GetFiles(){
-        return array("alphatest.php");
+        return array("alphatest.php","alphatest.hm");
     }
     public function Requires(){
         return array();
     }
     public function GetVersion(){
-        return "0.1";
+        return "0.2";
     }
     public function GetName(){
         return "Alphatest module";
