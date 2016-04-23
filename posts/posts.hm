@@ -10,7 +10,7 @@ $this->createpost = function(){
 		$blog = json_decode(file_get_contents("./content/blog.json"));
 		echo urlencode($this->args[2]). " created\n";
 		echo "Post URL is ".$blog->URL."?/post/".urlencode($this->args[2])."/\n";
-		$this->sitemap();
+		call_user_func_array(array($this,"sitemap"),array());
 	}
 	else{
 		echo "\033[01;31mCould not create new post.\033[0\n";
@@ -48,7 +48,7 @@ $this->deletepost = function(){
 	}
 	if ($deletion){
 		echo "File deleted, updating sitemap.xml\n";
-		$this->sitemap();
+		call_user_func_array(array($this,"sitemap"),array());
 	}
 };
 $this->dynamicMethods[]= "deletepost";
