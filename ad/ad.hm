@@ -20,3 +20,12 @@ $this->setad = function(){
 	}
 };
 $this->dynamicMethods[]= "setad";
+$this->getad = function(){
+	if ($this->args[1] == "help"){
+		return "Get ad html content\n";
+	}
+	$content = file_get_contents("./content/ad.json");
+	$data = json_decode($content);
+	echo "Changed ".date("d.m.Y H:i:s",$data->Date).": ".$data->Content."\n";
+};
+$this->dynamicMethods[]= "getad";
