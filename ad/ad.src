@@ -2,7 +2,7 @@
 
 class Ad implements ISideUnit{
     public function GetFiles(){
-        return array("ad.php","hm.php");
+        return array("ad.php","ad.src");
     }
     public function Requires(){
         return array();
