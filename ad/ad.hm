@@ -1,0 +1,22 @@
+<?php
+$this->setad = function(){
+	if ($this->args[1] == "help"){
+		return "Set ad html content\n";
+	}
+	if (!isset($this->args[2])){
+		echo "No argument set\n";
+	}
+	$data = new \stdClass();
+	$data->Date = time();
+	$data->Content = $this->args[2];
+	$json = json_encode($data,JSON_PRETTY_PRINT);
+
+	$success = file_put_contents("./content/ad.json",$json) > 0;
+	if ($success){
+		echo "File written\n";
+	}
+	else{
+		echo "Could not write file\n";
+	}
+};
+$this->dynamicMethods[]= "setad";

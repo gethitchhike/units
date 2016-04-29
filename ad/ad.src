@@ -1,0 +1,24 @@
+<?php
+
+class Ad implements ISideUnit{
+    public function GetFiles(){
+        return array("ad.php","hm.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Advertisement module";
+    }
+    public function Run(){
+        //nothing
+        if (file_exists("./content/ad.json")){
+            $config = json_decode(file_get_contents("./content/ad.json"));
+            echo $config->Content;
+        }
+
+    }
+}
