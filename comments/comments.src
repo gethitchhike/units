@@ -7,7 +7,7 @@ class Comments implements IPostUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.1";
+        return "0.1.1";
     }
     public function GetName(){
         return "Comments Unit";
@@ -67,7 +67,7 @@ class Comments implements IPostUnit{
           }
       }
       //current comments
-      $query = "SELECT * FROM comments where post = :postname order by timestamp desc";
+      $query = "SELECT * FROM comments where post = :postname order by timestamp asc";
       $stmt = $db->prepare($query);
       $stmt->bindParam(':postname', $php->get->post); 
       $stmt->execute();
