@@ -15,7 +15,7 @@
 
 class ContactForm implements IPreUnit{
     public function GetFiles(){
-        return array("contactform.php");
+        return array("contactform.php","contactform.hm");
     }
     public function Requires(){
         return array();
