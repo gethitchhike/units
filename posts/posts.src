@@ -21,7 +21,7 @@ class Posts implements IOnDemandUNit{
         return array();
     }
     public function GetVersion(){
-    	return "0.2.1";
+    	return "0.2.2";
     }
 	public function GetName(){
 		return "Posts";
