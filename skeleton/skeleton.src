@@ -15,11 +15,11 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-    	return "0.2.1";
+        return "0.2.3";
     }
-	public function GetName(){
-		return "Skeleton";
-	}
+    public function GetName(){
+        return "Skeleton";
+    }
     private function GetSitemapContent(){
         global $blog;
         $p = new Posts();
@@ -38,7 +38,7 @@ class Skeleton implements IPreUnit{
         $sitemap .= $entry;
         
         foreach($posts as $post){
-            $url = htmlspecialchars($blog->URL."?/post/&post=".urlencode($post->Filename));
+            $url = $blog->URL."?/post/".$post->WebFilename."/";
 
             $entry = "<url>\n".
                     "<loc>".$url."</loc>\n".
@@ -49,7 +49,7 @@ class Skeleton implements IPreUnit{
             $sitemap .= $entry;
         }
         foreach($sites as $site){
-            $url = htmlspecialchars($blog->URL."?/post/&post=".urlencode($site->Filename));
+            $url = $blog->URL."?/post/".$site->WebFilename."/";
             $entry = "<url>\n".
                     "<loc>".$url."</loc>\n".
                     "<lastmod>".date("Y-m-d",filectime(__CONTENTPATH__.$site->Filename))."</lastmod>\n".
@@ -72,7 +72,7 @@ class Skeleton implements IPreUnit{
         }
     }
     public function Run(){
-    	global $router;
+        global $router;
         $this->CreateSitemapIfNeeded();
         $router->Route("/",function($php) use ($router){
             global $blog;

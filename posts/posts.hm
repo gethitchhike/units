@@ -25,9 +25,7 @@ $this->geturl = function(){
 	if ($result){
 		$arg =str_replace(array(".smd",".md"),"",basename($this->args[2]));
 		$blog = json_decode(file_get_contents("./content/blog.json"));
-		echo urlencode($this->args[2]). " created\n";
 		echo "Post URL is ".$blog->URL."?/post/".urlencode($arg)."/\n";
-		call_user_func_array(array($this,"sitemap"),array());
 	}
 	else{
 		echo "\033[01;31mCould not find file.\033[0\n";
