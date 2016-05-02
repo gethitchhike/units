@@ -8,7 +8,7 @@ class RSS implements IPreUnit{
         return array("Posts");
     }
     public function GetVersion(){
-        return "0.2";
+        return "0.3";
     }
     public function GetName(){
         return "RSS Unit";
@@ -48,7 +48,7 @@ class RSS implements IPreUnit{
             }
             foreach ($posts as $entry) {
                 $item = new \Suin\RSSWriter\Item();
-                $name = !empty($entry->Author->Name)? $entry->Author->Email. " (".$entry->Author->Name.")" : $entry->Author->Email;
+                $name = !empty($entry->Author->Name)? $entry->Author->Name : $blog->Name;
                 $item
                         ->title($entry->Title)
                         ->description($Parsedown->text($entry->Content))
