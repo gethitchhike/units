@@ -8,7 +8,7 @@ class Stats implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.1.2";
+        return "0.1.3";
     }
     public function GetName(){
         return "Get statistics";
@@ -20,17 +20,19 @@ class Stats implements IPreUnit{
                       id INTEGER PRIMARY_KEY,
                       timestamp INTEGER,
                       target TEXT,
-                      UserAgent TEXT)");
+                      UserAgent TEXT,
+                      ref TEXT)");
     }
     private function AddHit(){
       $db = new PDO('sqlite:'.dirname(__DIR__)."/content/stats.db");
       $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      $insert = "INSERT INTO stats (timestamp,target,UserAgent) 
-                VALUES (:timestamp,:target,:ua)";
+      $insert = "INSERT INTO stats (timestamp,target,UserAgent,ref) 
+                VALUES (:timestamp,:target,:ua,:ref)";
       $stmt = $db->prepare($insert);
       $stmt->bindParam(':timestamp', time());
       $stmt->bindValue(':target',$_SERVER["REQUEST_URI"]);
       $stmt->bindValue(':ua',$_SERVER["HTTP_USER_AGENT"]);
+      $stmt->bindValue(':ref',$_SERVER["HTTP_REFERER"]);
       $stmt->execute();
     }
     public function Run(){
