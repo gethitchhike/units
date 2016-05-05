@@ -65,7 +65,7 @@ class Comments implements IPostUnit{
             $stmt->bindParam(':timestamp', time());
             $stmt->execute();
             if (property_exists($post->Author,"Email") && !empty($post->Author->Email)){
-              $content = sprintf("New comment by %s on %s:\n\n\"%s\"",$author,$blog->URL."index.php?/post&post=".$php->get->post,$message);
+              $content = sprintf("New comment by %s on %s:\n\n\"%s\"",$author,$blog->URL."index.php?/post/".$php->get->post."/",$message);
               mail ($post->Author->Email , $blog->Name.": Comment" , $content );
             }
           }else{
