@@ -15,11 +15,11 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-        return "0.3";
+    	return "0.3.1";
     }
     public function GetName(){
-        return "Skeleton";
-    }
+		return "Skeleton";
+	}
     private function GetSitemapContent(){
         global $blog;
         $p = new Posts();
@@ -28,6 +28,9 @@ class Skeleton implements IPreUnit{
          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
          xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\">\n";
         $posts = $p->Run();
+        $posts = array_filter($p->Run(),function($p){
+            return !$p->Hidden;
+        });
         $sites = $p->Run(".smd");
         $entry = "<url>\n".
                 "<loc>".$blog->URL."</loc>\n".
@@ -72,7 +75,7 @@ class Skeleton implements IPreUnit{
         }
     }
     public function Run(){
-        global $router;
+    	global $router;
         $this->CreateSitemapIfNeeded();
         $router->Route("/",function($php) use ($router){
             global $blog;
