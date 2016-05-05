@@ -1,12 +1,12 @@
 <?php
 class Post{
-	public $Title;
-	public function GetSlug(){
-		return str_replace(array("."),array(""),$this->Title);
-	}
-	public $Filename;
+    public $Title;
+    public function GetSlug(){
+        return str_replace(array("."),array(""),$this->Title);
+    }
+    public $Filename;
     public $WebFilename;
-	public $Content;
+    public $Content;
     public $Date;
     public $Author;
     public $Image;
@@ -21,25 +21,25 @@ class Posts implements IOnDemandUNit{
         return array();
     }
     public function GetVersion(){
-    	return "0.2.2";
+        return "0.3";
     }
-	public function GetName(){
-		return "Posts";
-	}
+    public function GetName(){
+        return "Posts";
+    }
     public function Run($filter = ".md"){
         global $blog;
-    	$files = array_filter(scandir(__CONTENTPATH__),function($f) use ($filter){
-    		return \BTRString::EndsWith($f,$filter,true);
-    	});
-    	$posts = array();
-    	foreach($files as $file){
-    		$content =  file_get_contents(__CONTENTPATH__."/".$file);
-    		$post = new \Post();
+        $files = array_filter(scandir(__CONTENTPATH__),function($f) use ($filter){
+            return \BTRString::EndsWith($f,$filter,true);
+        });
+        $posts = array();
+        foreach($files as $file){
+            $content =  file_get_contents(__CONTENTPATH__."/".$file);
+            $post = new \Post();
 
-    		
-    		$post->Title = $this->GetPostTitle($content,$file);
+            
+            $post->Title = $this->GetPostTitle($content,$file);
 
-    		$post->Content =$this->GetPostContent($content);
+            $post->Content =$this->GetPostContent($content);
             $matches = array();
             //Set post date
             if (preg_match("/~date\((?<date>[^)]+)\)/",$post->Content,$matches)){
@@ -79,7 +79,7 @@ class Posts implements IOnDemandUNit{
             foreach($matches["tag"] as $match){
                 if (!empty($match)){
                     $post->Content = str_replace("~".$match,"",$post->Content);
-                    $post->Tags[] = $match;
+                    $post->Tags[] = strtolower($match);
                 }
             }
             if (is_null($post->Author)){
@@ -87,25 +87,25 @@ class Posts implements IOnDemandUNit{
             }
             $post->Filename = $file;
             $post->WebFilename = urlencode(str_replace(array(".smd",".md"), "", $file));
-    		$posts[] = $post;
-    	}
+            $posts[] = $post;
+        }
         usort($posts,function($a,$b){
             return  ($a->Date < $b->Date) ? 1 : -1;
         });
-    	return  $posts;
+        return  $posts;
     }
     private function GetPostTitle($content,$filename){
-    	$lines = explode("\n",$content);
-    	
-    	if (count($lines) == 0 || !\BTRString::StartsWith($lines[0],"#",true)){
-    		return $filename;
-    	}
-    	else{
-    		return trim(str_replace("#","",$lines[0]));
-    	}
+        $lines = explode("\n",$content);
+        
+        if (count($lines) == 0 || !\BTRString::StartsWith($lines[0],"#",true)){
+            return $filename;
+        }
+        else{
+            return trim(str_replace("#","",$lines[0]));
+        }
     }
     private function GetPostContent($content){
-    	$lines = explode("\n",$content);
-    	return str_replace($lines[0],"",$content);
+        $lines = explode("\n",$content);
+        return str_replace($lines[0],"",$content);
     }
 }

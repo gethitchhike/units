@@ -15,7 +15,7 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-        return "0.2.3";
+        return "0.3";
     }
     public function GetName(){
         return "Skeleton";
@@ -80,20 +80,6 @@ class Skeleton implements IPreUnit{
             $posts = array_filter($p->Run(),function($p){
                 return !$p->Hidden;
             });
-            $query = null;
-            if (isset($php->post->query)){
-                $query = $php->post->query;
-            }
-            if (isset($php->get->query)){
-                $query = $php->get->query;
-            }
-            
-            if (!is_null($query)){
-                $posts = array_filter($posts,function($p) use ($php,$query){
-                    $needle = $query;
-                    return \BTRString::Contains(strtolower($p->Title),$needle) || \BTRString::Contains(strtolower($p->Content),$needle);
-                });
-            }
             $sites = $p->Run(".smd");
             $title = $blog->Name;
             $innerContent = __DIR__."/".$this->theme."/latest.php";
@@ -110,6 +96,37 @@ class Skeleton implements IPreUnit{
             
             require_once(__DIR__."/".$this->theme."/template.php");
         });
+        $router->Route("/tag/",function($php){
+            global $blog;
+            $p = new Posts();
+            $posts = array_filter($p->Run(),function($p){
+                return !$p->Hidden;
+            });
+            $query = null;
+            if (isset($php->get->tag)){
+                $query = strtolower($php->get->tag);
+            }
+            if (!is_null($query)){
+                $posts = array_filter($posts,function($p) use ($php,$query){
+                    $needle = $query;
+                    return  (!is_null($p->Tags)?in_array($needle, $p->Tags) : false);
+                });
+            }
+            $sites = $p->Run(".smd");
+            $title = $blog->Name;
+            $innerContent = __DIR__."/".$this->theme."/latest.php";
+            $postCount = count($posts);
+            $currentSite = isset($php->get->site) ? (int)$php->get->site : 1;
+          
+            $allPageCount = $postCount/5.0;
+            $fullPageCount = ceil($postCount/5.0);
+            $min = 0;
+            $max = $fullPageCount;
+            //filter
+            $offset = $currentSite == 1 ? 0 : ($currentSite -1)*5.0;
+            $posts = array_slice($posts,$offset,$currentSite*5.0);
+            require_once(__DIR__."/".$this->theme."/template.php"); 
+        },array("tag"));
         $router->Route("/post/",function($php){
             global $blog;
             $p = new Posts();
