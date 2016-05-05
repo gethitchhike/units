@@ -7,7 +7,7 @@ class Comments implements IPostUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.1.1";
+        return "0.1.2";
     }
     public function GetName(){
         return "Comments Unit";
@@ -30,11 +30,17 @@ class Comments implements IPostUnit{
       }
       return $stripped ||  $isSpammer;
     }
+    private function CopyDataBase(){
+      if (!file_exists(dirname(__DIR__)."/content/comments.db")){
+        copy(__DIR__."/comments/comments.db",dirname(__DIR__)."/content/comments.db");
+      }
+    }
     public function Run(){
       global $php;
       global $post;
       global $blog;
-      $db = new PDO('sqlite:'.__DIR__."/comments/comments.db");
+      $this->CopyDataBase();
+      $db = new PDO('sqlite:'.dirname(__DIR__)."/content/comments.db");
       $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       //$db->exec("Drop table comments");
       $db->exec("CREATE TABLE IF NOT EXISTS comments (
@@ -45,7 +51,7 @@ class Comments implements IPostUnit{
                       timestamp INTEGER)");
       if (!is_array($php->post)){
           $author = $php->post->name;
-          $message = $php->post->comment;
+          $message = strip_tags($php->post->comment);
           $isSpam = $this->IsSpam($message,$author);
           if (!$isSpam && !empty($author) && !empty($message)){
             $insert = "INSERT INTO comments (author, message,post, timestamp) 
