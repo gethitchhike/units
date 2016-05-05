@@ -8,7 +8,7 @@ class Stats implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.1.3";
+        return "0.1.4";
     }
     public function GetName(){
         return "Get statistics";
