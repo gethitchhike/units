@@ -2,7 +2,7 @@
 
 $this->getstats = function(){
 	if ($this->args[1] == "help"){
-		return "Generate the sitemap.xml file\n";
+		return "Get statistics for current month\n";
 	}
 	$db = new PDO('sqlite:'.dirname(__DIR__)."/content/stats.db");
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
