@@ -1,0 +1,74 @@
+<?php
+
+class TagCloud implements ISideUnit{
+    public function GetFiles(){
+        return array("tagcloud.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Displays a tag cloud based on the post tags";
+    }
+    public function Run(){
+        $tagContent = array();
+
+        $p = new Posts();
+
+        $posts = $p->Run();
+        foreach($posts as $post){
+            $tags = $post->Tags;
+            if (!is_null($tags)){
+                foreach($tags as $tag){
+                    if (!is_numeric($tag)){
+                        if (isset($tagContent[$tag])){
+                            $tagContent[$tag]++;
+                        }
+                        else{
+                            $tagContent[$tag] = 1;
+                        }
+                    }
+                }
+            }
+        }
+        $displayCloud = array();
+        $sum = 0;
+        foreach($tagContent as $key => $value){
+            $sum += $value;
+        }
+        foreach($tagContent as $key => $value){
+            $sum += $value;
+            $percent = ceil(100/($sum/$value));
+            $displayCloud[$key] = $percent;
+        }
+        foreach($displayCloud as $key => $value){
+            $size = "";
+            if ($value <= 10.0){
+                $size = "xx-small";
+            }
+            else if ($value <= 20.0){
+                $size = "x-small";
+            }
+            else if ($value <= 30.0){
+                $size = "small";
+            }
+            else if ($value <= 40.0){
+                $size = "medium";
+            }
+            else if ($value <= 50.0){
+                $size = "large";
+            }
+            else if ($value <= 60.0){
+                $size = "x-large";
+            }
+            else{
+                $size = "xx-large";
+            }
+            echo "<a href='?/tag/".$key."/'><span style='padding-right:0.2em;font-size:".$size."'>$key</span></a>";
+        }
+    }
+}
+
