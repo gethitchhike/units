@@ -1,0 +1,54 @@
+<?php
+
+$this->getstats = function(){
+	if ($this->args[1] == "help"){
+		return "Generate the sitemap.xml file\n";
+	}
+	$db = new PDO('sqlite:'.dirname(__DIR__)."/content/stats.db");
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $d = new DateTime('first day of this month');
+    $start =  $d->getTimeStamp();
+    $dE = new DateTime('last day of this month');
+    $end =  $dE->getTimeStamp();
+	$query = "SELECT * FROM stats where timestamp >= :start and timestamp <= :end";
+	$stmt = $db->prepare($query);
+	$stmt->bindParam(':start', $start);
+	$stmt->bindParam(':end', $end);
+	$stmt->execute();
+	$stats = $stmt->fetchAll();
+	$daysWithStats = array();
+
+	foreach($stats as $stat){
+		$day = (int)date("d",$stat["timestamp"]);
+		if (isset($daysWithStats[$day])){
+			$daysWithStats[$day]++;
+		}
+		else{
+			$daysWithStats[$day] = 1;
+		}
+	}
+	$startDay = (int)date("d",$start);
+	$endDay = (int)date("d",$end);
+	$diagramMatrix = array();
+	$maximum = 0;
+	$sum  = 0;
+	for($i = $startDay; $i<=$endDay;$i++){
+		if (isset($daysWithStats[$i])){
+			$diagramMatrix[$i] = $daysWithStats[$i];
+		}
+		else{
+			$diagramMatrix[$i] = 0;
+		}
+		if ($diagramMatrix[$i] > $maximum){
+			$maximum = $diagramMatrix[$i];
+		}
+		$sum += $diagramMatrix[$i];
+	}
+	$datePart = date("m.Y",$start);
+	foreach($diagramMatrix as $key => $value){
+		$prettyDate = date("d.m.Y",strtotime( "$key.".$datePart));
+		echo $prettyDate.": ".$value.($value === $maximum ? " (maximum)":"")."\n";
+	}
+	echo "Average is ".round($sum/$endDay,4)." hits/ day\n";
+};
+$this->dynamicMethods[]= "getstats";
