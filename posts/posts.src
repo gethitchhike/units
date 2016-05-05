@@ -21,7 +21,7 @@ class Posts implements IOnDemandUNit{
         return array();
     }
     public function GetVersion(){
-        return "0.3";
+        return "0.3.1";
     }
     public function GetName(){
         return "Posts";
@@ -72,7 +72,7 @@ class Posts implements IOnDemandUNit{
             $post->Hidden = $found == 1;  
             $post->Content = str_replace("~hidden","",$post->Content);  
             //Set other tags
-            $tagsPattern = "/~(?<tag>[a-zA-Z0-9]+)/";
+            $tagsPattern = "/\s~(?<tag>[a-zA-Z0-9]+)/";
             $matches = array();
             preg_match_all($tagsPattern,$post->Content,$matches);
             $post->Tags =array();
