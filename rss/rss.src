@@ -8,7 +8,7 @@ class RSS implements IPreUnit{
         return array("Posts","suin/php-rss-writer");
     }
     public function GetVersion(){
-        return "0.3";
+        return "0.4";
     }
     public function GetName(){
         return "RSS Unit";
