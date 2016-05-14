@@ -52,7 +52,7 @@ $this->getstats = function(){
 	echo "Average is ".round($sum/$endDay,4)." hits/ day\n";
 };
 $this->dynamicMethods[]= "getstats";
-$this->clientstats = function(){
+$this->getclients = function(){
 	if ($this->args[1] == "help"){
 		return "Get client statistics\n";
 	}
@@ -75,4 +75,28 @@ $this->clientstats = function(){
 		echo "\"".$key."\": ".$value." hits\n";
 	}
 };
-$this->dynamicMethods[]= "clientstats";
+$this->dynamicMethods[]= "getclients";
+$this->getbots = function(){
+	if ($this->args[1] == "help"){
+		return "Get client statistics\n";
+	}
+	$db = new PDO('sqlite:'.dirname(__DIR__)."/content/stats.db");
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$query = "SELECT * FROM stats where UserAgent like '%bot%' or  UserAgent like '%Bot%'";
+	$stmt = $db->prepare($query);
+	$stmt->execute();
+	$stats = $stmt->fetchAll();
+	$browser = array();
+	foreach($stats as $stat){
+		if (isset($browser[$stat["UserAgent"]])){
+			$browser[$stat["UserAgent"]]++;
+		}
+		else{
+			$browser[$stat["UserAgent"]] = 1;
+		}
+	}
+	foreach($browser as $key => $value){
+		echo "\"".$key."\": ".$value." hits\n";
+	}
+};
+$this->dynamicMethods[]= "getbots";
