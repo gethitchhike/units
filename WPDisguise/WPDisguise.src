@@ -1,0 +1,20 @@
+<?php
+
+class WPDisguise implements IPreUnit{
+    public function GetFiles(){
+        return array("WPDisguise.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Disguise Hitchike as WordPress 4.5.2";
+    }
+    public function Run(){
+        global $metatags;
+        $metatags["generator"] = "WordPress 4.5.2";
+    }
+}
