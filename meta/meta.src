@@ -17,11 +17,9 @@ class Meta implements IHeadUnit{
         global $post;
         $Parsedown = new \Parsedown();
         $description  = is_null($post) ? (!empty($blog->Description) ? $blog->Description : "") : \BTRString::SubStrClause(strip_tags($Parsedown->text($post->Content)),2,true)."...";
-        $tags = array(
-            "generator" => __CAMOUFLAGE__ === "true" ? "WordPress 4.5" : "Hitchhike ". __HVERSION__,
-            "description" => $description
-        );
-        foreach($tags as $key => $value){
+        global $metatags;
+        $metatags["description"] = $description;
+        foreach($metatags as $key => $value){
             echo "<meta name='".$key."' value='".$value."'>\n";
         }
     }
