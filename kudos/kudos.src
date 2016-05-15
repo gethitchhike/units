@@ -1,0 +1,82 @@
+<?php
+
+class Kudos implements IPostUnit{
+		public function GetFiles(){
+			return array("kudos.php");
+		}
+		public function Requires(){
+			return array();
+		}
+		public function GetVersion(){
+			return "0.0.1";
+		}
+		public function GetName(){
+			return "Gain kudos for your posts";
+		}
+
+		private function getClientIdentifier() {
+			return md5($_SERVER['REMOTE_ADDR']);
+		}
+
+		private function isAllowedToAddKudosToPost($db, $post, $clientIdentifier) {
+			$query = "SELECT COUNT(id) FROM kudos WHERE post = :post AND clientIdentifier = :clientIdentifier";
+			$stmt = $db->prepare($query);
+			$stmt->bindParam(':post', $post);
+			$stmt->bindParam(':clientIdentifier', $clientIdentifier);
+			$stmt->execute();
+
+			return ($stmt->fetchColumn() == 0) ? true : false;
+		}
+
+		private function getKudos($db, $post) {
+			$query = "SELECT COUNT(id) FROM kudos WHERE post = :post";
+			$stmt = $db->prepare($query);
+			$stmt->bindParam(':post', $post);
+			$stmt->execute();
+
+			return $stmt->fetchColumn();
+		}
+
+		public function Run(){
+			global $php;
+			global $post;
+			
+			$db = new PDO('sqlite:'.dirname(__DIR__)."/content/kudos.db");
+			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$db->exec("CREATE TABLE IF NOT EXISTS kudos (
+						id INTEGER PRIMARY KEY AUTOINCREMENT, 
+						post TEXT,
+						clientIdentifier TEXT)");
+
+			$clientIdentifier = $this->getClientIdentifier();
+			$allowedToAddKudos = $this->isAllowedToAddKudosToPost($db, $post->Title, $clientIdentifier);
+
+			if (!is_array($php->post)) {
+				if(!empty($php->post->givekudos)) {
+					if ($allowedToAddKudos) {
+						$insert = "INSERT INTO kudos(id, post, clientIdentifier)
+									VALUES(NULL, :post, :clientIdentifier);";
+						$stmt = $db->prepare($insert);
+						$stmt->bindParam(':post', $post->Title);
+						$stmt->bindParam(':clientIdentifier', $clientIdentifier);
+						$stmt->execute();
+
+						$allowedToAddKudos = false;
+					}
+				}
+			}
+
+			$kudos = $this->getKudos($db, $post->Title);
+
+			echo "<div class=\"social\" style=\"text-align: right;\">";
+			if ($allowedToAddKudos) {
+				echo "<form method=\"post\">$kudos kudos <a href=\"javascript:;\" onclick=\"parentNode.submit();\" title=\"Give kudos\">+</a>".
+						"<input type=\"hidden\" name=\"givekudos\" value=1 /></form>";
+			} else {
+				echo "<span title=\"You already gave kudos\">$kudos kudos</span>";
+			}
+			echo "</div>";
+
+			$db = null;
+		}
+}
