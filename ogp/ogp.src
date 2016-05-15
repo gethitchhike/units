@@ -1,0 +1,65 @@
+<?php
+class OGP implements IHeadUnit{
+    public function GetFiles(){
+        return array("ogp.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Open Graph Tags";
+    }
+    public function Run(){
+        global $blog;
+        global $post;
+        $Parsedown = new \Parsedown();
+        $description  = is_null($post) ? (!empty($blog->Description) ? $blog->Description : "") : \BTRString::SubStrClause(strip_tags($Parsedown->text($post->Content)),2,true)."...";
+        $ogp = array();
+        if (is_null($post)){
+            //start page
+            $ogp["og:title"] = $blog->Name;
+            $ogp["og:type"] = "website";
+            $ogp["og:url"] = $blog->URL;
+            if (!empty($blog->Image)){
+                $ogp["og:image"] = $blog->Image;
+            }
+            $ogp["og:description"] = $description;
+        }
+        else{
+            //article
+            $ogp["og:title"] = $post->Title;
+            $ogp["og:type"] = "article";
+            $ogp["og:url"] = $blog->URL."?/post/".$post->WebFilename."/";
+            if (!empty($post->Image)){
+                $ogp["og:image"] = $post->Image;
+            }
+            $ogp["og:description"] = $description;
+            $ogp["og:article:publsihed"] = date("c",$post->Date);
+            if (count($post->Tags) != 0){
+                $ogp["og:article:tag"] = array();
+                foreach($post->Tags as $tag){
+                    $ogp["og:article:tag"][] = $tag;
+                }
+            }
+            $ogp["og:article:author:username"] = $post->Author->Signature; 
+            $nameParts = explode(" ",$post->Author->Name);
+            if (count($nameParts) === 2){
+                 $ogp["og:article:author:first_name"] = $nameParts[0]; 
+                 $ogp["og:article:author:last_name"] = $nameParts[1]; 
+            }
+        }
+        foreach($ogp as $key => $value){
+            if (!is_array($value)){
+                echo "<meta property=\"".$key."\" content=\"".$value."\" />\n";
+            }
+            else{
+                foreach($value as $arrTag){
+                    echo "<meta property=\"".$key."\" content=\"".$arrTag."\" />\n";
+                }
+            }
+        }
+    }
+}
