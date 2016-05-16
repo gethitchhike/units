@@ -15,7 +15,7 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-    	return "0.3.2";
+    	return "0.4";
     }
     public function GetName(){
 		return "Skeleton";
@@ -85,7 +85,7 @@ class Skeleton implements IPreUnit{
             });
             $sites = $p->Run(".smd");
             $title = $blog->Name;
-            $innerContent = __DIR__."/".$this->theme."/latest.php";
+            $innerContent = dirname(__DIR__)."/themes/".$this->theme."/latest.php";
             $postCount = count($posts);
             $currentSite = isset($php->get->site) ? (int)$php->get->site : 1;
           
@@ -97,7 +97,7 @@ class Skeleton implements IPreUnit{
             $offset = $currentSite == 1 ? 0 : ($currentSite -1)*5.0;
             $posts = array_slice($posts,$offset,$currentSite*5.0);
             
-            require_once(__DIR__."/".$this->theme."/template.php");
+            require_once(dirname(__DIR__)."/themes/".$this->theme."/template.php");
         });
         $router->Route("/tag/",function($php){
             global $blog;
@@ -117,7 +117,7 @@ class Skeleton implements IPreUnit{
             }
             $sites = $p->Run(".smd");
             $title = $blog->Name;
-            $innerContent = __DIR__."/".$this->theme."/latest.php";
+            $innerContent = dirname(__DIR__)."/themes/".$this->theme."/latest.php";
             $postCount = count($posts);
             $currentSite = isset($php->get->site) ? (int)$php->get->site : 1;
           
@@ -128,7 +128,7 @@ class Skeleton implements IPreUnit{
             //filter
             $offset = $currentSite == 1 ? 0 : ($currentSite -1)*5.0;
             $posts = array_slice($posts,$offset,$currentSite*5.0);
-            require_once(__DIR__."/".$this->theme."/template.php"); 
+            require_once(dirname(__DIR__)."/themes/".$this->theme."/template.php"); 
         },array("tag"));
         $router->Route("/post/",function($php){
             global $blog;
@@ -156,8 +156,9 @@ class Skeleton implements IPreUnit{
                 $post->HTTPCode = 404;
             }
             $title = $post->Title. "-" .$blog->Name;
-            $innerContent = __DIR__."/".$this->theme."/post.php";
-            require_once(__DIR__."/".$this->theme."/template.php");
+            $innerContent =dirname(__DIR__)."/themes/".$this->theme."/post.php";
+            require_once(dirname(__DIR__)."/themes/".$this->theme."/template.php");
         },array("post"));   
     }
 }
+
