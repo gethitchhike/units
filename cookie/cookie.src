@@ -1,0 +1,39 @@
+<?php
+
+class Cookie implements IPrePostUnit{
+    public function GetFiles(){
+        return array("cookie.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Display EU cookie law warning";
+    }
+    public function Run(){
+        global $translation;
+        $text = $translation["cookies"];
+        $accept = $translation["cookiesaccept"];
+        echo "<span id='banner' class='banner' style='    width: 100%;
+                left: 0px;
+                bottom: 0px;
+                position: fixed;
+                background-color: red;
+                text-align: center;
+                color:white;
+                display: block;'>".$text." <a href='#' onclick='hideLink()' style='text-decoration:none; color: white; font-weight: bold;'>".$accept."</a></span>";
+        echo "<script>
+        function hideLink(){
+            document.cookie = \"cookieaccepted=true\";
+            var banner = document.getElementById('banner');
+            banner.style.display = 'none'
+        }
+        if (document.cookie.indexOf(\"cookieaccepted=true\") !== -1){
+            hideLink();
+        }
+        </script>";
+    }
+}
