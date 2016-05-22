@@ -100,3 +100,41 @@ $this->getbots = function(){
 	}
 };
 $this->dynamicMethods[]= "getbots";
+$this->topsites = function(){
+	if ($this->args[1] == "help"){
+		return "Get 20 top hit sites\n";
+	}
+	$db = new PDO('sqlite:'.dirname(__DIR__)."/content/stats.db");
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $d = new DateTime('first day of this month');
+    $start =  $d->getTimeStamp();
+    $dE = new DateTime('last day of this month');
+    $end =  $dE->getTimeStamp();
+    $startDay = (int)date("d",$start);
+	$endDay = (int)date("d",$end);
+	$query = "Select (Select count(target) from Stats where Stats.target = st.target and timestamp >= :start and timestamp <= :end)  as hits, target from Stats st group by target order by hits DESC limit 20";
+	$stmt = $db->prepare($query);
+	$stmt->bindParam(':start', $start);
+	$stmt->bindParam(':end', $end);
+	$stmt->execute();
+	$stats = $stmt->fetchAll();
+	$browser = array();
+	foreach($stats as $stat){
+		echo $stat["hits"]." hits : ".$stat["target"]."\n";
+	}
+};
+$this->dynamicMethods[]= "topsites";
+$this->cleanstats = function(){
+	if ($this->args[1] == "help"){
+		return "Clean Backup stats database and create an empty one\n";
+	}
+	$newName = "./content/stats".time().".db";
+	$got = rename("./content/stats.db",$newName);
+	if ($got){
+		echo "Database backup name is ".$newName."\n";
+	}
+	else{
+		echo "Error while moving.\n";
+	}
+};
+$this->dynamicMethods[]= "cleanstats";

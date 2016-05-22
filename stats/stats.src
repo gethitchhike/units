@@ -8,10 +8,10 @@ class Stats implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.2";
+        return "0.3";
     }
     public function GetName(){
-        return "Get statistics";
+        return "Record privacy friendly statistics. Unit counts hits only.";
     }
     private function SetUp(){
       $db = new PDO('sqlite:'.dirname(__DIR__)."/content/stats.db");
