@@ -1,0 +1,20 @@
+<?php
+
+class Health{
+    public function GetFiles(){
+        return array("health.php","health.hm");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Check installation for problems";
+    }
+    public function Run(){
+        //The Health plugin does not do anything
+    }
+}
+

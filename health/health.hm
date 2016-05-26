@@ -1,0 +1,53 @@
+<?php
+$this->check = function(){
+	if ($this->args[1] == "help"){
+			return "Check installation for problems\n";
+		}
+		$blog = json_decode(file_get_contents("./content/blog.json"));
+		$problems = 0;
+		$autoFix = false;
+		if (isset($this->args[2]) && $this->args[2] === "fix"){
+			$autoFix = true;
+		}
+		if (!is_writable("./content") || !file_exists("./content")){
+				 echo "\033[01;31mContent folder not writeable or is not existing. \033[0m \n";
+				 $problems++;
+		}
+		if (!file_exists("./sitemap.xml")){
+				 echo "\033[01;31mSitemap not existing. \033[0m \n";
+				 if ($autoFix){
+					echo "Fixing problem...\n";
+					call_user_func_array(array($this,"sitemap"),array());
+				 }
+				 $problems++;
+		}
+		$authorCount= count($blog->Authors);
+		$emptyCount = array_filter($blog->Authors,function($a){
+				return $a->Signature === "~signature";
+		});
+		if ($emptyCount == $authorCount){
+			echo "\033[01;31mBlog authors not configured. \033[0m \n";
+			$problems++;
+		}
+		if (\BTRString::EndsWith($blog->URL,"/") === false){
+			echo "\033[01;31mBlog URL malformed. \033[0m \n";
+			$problems++;
+		}
+		$units = scandir("./units");
+		$disabled = array_filter($units,function($u){
+				return \BTRString::EndsWith($u,".disabled");
+		});
+		$percent = count($disabled) != 0 ?  100/(count($units)/count($disabled)) : 0 ;
+		if ($percent > 5){
+			echo "\033[01;31m".round($percent,2)."% of your units are disabled. Consider removing some of them. \033[0m \n";
+			if ($autoFix){
+				//TODO: Removal of disabled units
+			}
+			$problems++;
+		}
+		echo $problems. " Problems detected\n";
+		if ($problems != 0){
+				echo "use 'hm.php check fix' to try auto fix of the problems\n";
+		}
+};
+$this->dynamicMethods[]= "check";
