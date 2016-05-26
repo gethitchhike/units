@@ -1,0 +1,33 @@
+<?php
+$this->service = function(){
+	if ($this->args[1] == "help"){
+		return "Disable or enable the complete site for service\n";
+	}
+	$parent = dirname(__DIR__);
+	if (file_exists($parent."/content/") ){
+		$result = false;
+		$switchingIntoMaint = false;
+		if (file_exists($parent."/content/service.lock")){
+			$result = unlink($parent."/content/service.lock");
+			$switchingIntoMaint = false;
+		}
+		else{
+			$result = touch($parent."/content/service.lock");
+			$switchingIntoMaint = true;
+		}
+		if ($result){
+			if ($switchingIntoMaint){
+				echo "Maintenance mode enabled.\n";
+			}
+			else{
+				echo "Maintenance mode disabled.\n";
+			}
+		}else{
+			echo "\033[01;31mCould not toggle service lock. \033[0m \n";
+		}
+	}
+	else{
+		echo "\033[01;31mCould not toggle service lock. \033[0m \n";
+	}
+};
+$this->dynamicMethods[]= "service";

@@ -1,0 +1,16 @@
+<?php
+
+class Maintenance{
+    public function GetFiles(){
+        return array("maintenance.php","maintenance.hm");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Enables Maintenance mode for the complete installation.";
+    }
+}
