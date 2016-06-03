@@ -1,7 +1,7 @@
 <?php
 class LoremIpsum{
     public function GetFiles(){
-        return array("loremipsum.php");
+        return array("loremipsum.php","loremipsum.hm");
     }
     public function Requires(){
         return array();
