@@ -1,0 +1,18 @@
+<?php
+class LoremIpsum{
+    public function GetFiles(){
+        return array("loremipsum.php");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Creates a sample blog content.";
+    }
+    public function Run(){
+        //this unit deos not have any action in the frontend
+    }
+}

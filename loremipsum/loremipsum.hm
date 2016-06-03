@@ -1,0 +1,39 @@
+<?php
+$this->sample = function(){
+	if ($this->args[1] == "help"){
+		return "Create a sample config.\n";
+	}
+ 	if (!file_exists("./content/blog.json")){ 
+ 		//Create data dir and fake users
+ 		mkdir("./content/");
+        $data = json_decode(file_get_contents("./blog.json.sample"));
+        $data->Name = "Jane and John";
+        $data->Subtitle = "This is an awesome blog";
+        $data->Copyright = "Jane and John";
+        $data->Language = "en";
+
+        $data->Authors[0]->Name = "Jane Doe";
+        $data->Authors[0]->Signature = "~jane";
+        $data->Authors[0]->Avatar = "https://avatars0.githubusercontent.com/u/13689977?v=3&s=200";
+
+        $data->Authors[1] = new \stdClass();
+        $data->Authors[1]->Name = "John Doe";
+        $data->Authors[1]->Signature = "~john";
+        $data->Authors[1]->Avatar = "https://avatars0.githubusercontent.com/u/13689977?v=3&s=200";
+
+        file_put_contents("./content/blog.json", json_encode($data,JSON_PRETTY_PRINT));
+
+        //create some posts
+
+        $posts = array();
+        $posts["This is a post"] = "#This is a post\nthis post got an image, too. ~image(https://gethitchhike.github.io/images/6UHHE19YG7.jpg) ~jane";
+        $posts["This is another post"] = "#This is another post\nthis post got an image, too. ~image(https://gethitchhike.github.io/images/6UHHE19YG7.jpg) ~john";
+		$posts["more text"] = "#More\n this post does not have any further images.~jane";
+		$posts["site"] = "#Site\n this is a site.~john";
+        foreach($posts as $key => $value){
+        	$ext = $key == "site" ? ".smd":".md";
+        	file_put_contents("./content/".urlencode($key).$ext, $value);
+        }
+    }
+};
+$this->dynamicMethods[]= "sample";
