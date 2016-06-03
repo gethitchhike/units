@@ -1,0 +1,273 @@
+<?php
+$this->search = function(){	
+	if ($this->args[1] == "help"){
+		return "Search for units on the masterserver\n";
+	}
+    $opts = array(
+        'http'=>array(
+            'method'=>"GET",
+            'header'=>"User-Agent: hm"
+        )
+    );
+
+    $context = stream_context_create($opts);
+    $result = @file_get_contents($this->packagesServer."?/list/",false,$context);
+    $data = json_decode($result);
+    $matches = array();
+    if (!is_null($data) && isset($this->args["2"])){
+        //search, data is valid
+        $needle = $this->args[2];
+        foreach($data as $key => $value){
+            if (\BTRString::Contains($value,$needle) || preg_match("/".$needle."/",$value) === 1){
+                $matches[] = $value;
+            }
+        }
+    }
+    echo "Found units\n";
+    if (count($matches) != 0){
+        foreach($matches as $match){
+            echo "- " .$match."\n";
+        }
+    }
+    else{
+        echo "No match found\n";
+    }
+};
+$this->dynamicMethods[]= "search";
+
+$this->units = function(){
+    if ($this->args[1] == "help"){
+        return "Get installed units\n";
+    }
+    echo "Installed units\n";
+    $units = scandir("./units");
+
+    foreach($units as $value){
+        if (strpos($value,".php") !== false){
+            $name = str_replace(".php","",$value);
+            include "./units/".$value;
+            $className = $name;
+            if (strpos($name,".disabled") !== false){
+                $className = str_replace(".disabled","",$name);
+                $name = str_replace(".disabled"," <disabled>",$name);
+            }
+            $foo = new $className();
+            echo $name ." ".$foo->GetVersion()."\n";
+        }
+    }
+};
+$this->dynamicMethods[]= "units";
+
+$this->enable = function(){
+    if ($this->args[1] == "help"){
+        return "Enables an unit\n";
+    }
+    $unit = "";
+    for($i = 2;$i< count($this->args);$i++){
+        $unit = $this->args[$i];
+        if (!file_exists("./units/".$unit.".php.disabled")){
+            echo "\033[01;31m".$unit."\033[0m is not installed or already enabled. \033[0m \n";
+            return false;
+        }
+        $result = rename("./units/".$unit.".php.disabled","./units/".$unit.".php");
+        if ($result){
+            echo "Enabled ".$unit."\n";
+        }
+        else{
+            echo "\033[01;31m".$unit."\033[0m could not be endabled. \033[0m \n";
+        }
+    }
+};
+$this->dynamicMethods[]= "enable";
+
+$this->disable = function(){
+    if ($this->args[1] == "help"){
+        return "Disables an unit\n";
+    }
+    $unit = "";
+    for($i = 2;$i< count($this->args);$i++){
+        $unit = $this->args[$i];
+        if (!file_exists("./units/".$unit.".php")){
+            echo "\033[01;31m".$unit."\033[0m is not installed or already disabled. \033[0m \n";
+            return false;
+        }
+        $result = rename("./units/".$unit.".php","./units/".$unit.".php.disabled");
+        if ($result){
+            echo "Disabled ".$unit."\n";
+        }
+        else{
+            echo "\033[01;31m".$unit."\033[0m could not be disabled. \033[0m \n";
+        }
+    }
+};
+$this->dynamicMethods[]= "disable";
+
+$this->install = function(){
+  if ($this->args[1] == "help"){
+        return "Install units \n";
+    }
+    $packages = array_filter($this->args,function($p){
+        return !\BTRString::Contains($p,"hm.php") && $p !== "install" && $p !== "packages";
+    });
+    $units = scandir("./units");
+    $allUnits = array();
+    foreach($units as $value){
+        if (strpos($value,".php") !== false){
+            $name = str_replace(".php","",$value);
+            if (strpos($name,".disabled") !== false){
+                $allUnits[] = str_replace(".disabled", "", $name);
+            }
+            else{
+                $allUnits[]= $name;
+            }
+        }
+    }
+    foreach($packages as $pkg){	
+        if (\BTRString::Contains($pkg,"/")){
+            echo "Installing third party package using composer...\n";
+            exec("composer require $pkg");
+        }
+        else{
+            if (in_array($pkg, $allUnits)){
+                echo "Package \"$pkg\" is already installed!\n";
+                break;
+            }
+            $opts = array(
+            'http'=>array(
+                'method'=>"GET",
+                'header'=>"User-Agent: hm"
+            )
+            );
+
+            $context = stream_context_create($opts);
+            $result = @file_get_contents($this->packagesServer."?/package/".$pkg."/",false,$context);
+            if ($result === false){
+                echo "Package \"$pkg\" not found!\n";
+                break;
+            }
+            $data = json_decode($result);
+            if (count($data->Requires) != 0){
+                foreach($data->Requires as $require){
+                    if (!in_array(strtolower($require), $allUnits) && !file_exists("./vendor/".$require."/")){
+                        echo "Please install \"$require\" first with hm.php install $require \n";
+                        exit();
+                    }
+                }
+            }
+            $files = $data->Files;
+            foreach($files as $file){
+                $localPath = str_replace($this->packagesServer."vendor/gethitchhike/units/".$pkg."/","",$file);
+                $parts = explode("/",$localPath);
+                $fullPath = "./units/";
+                //create folder structure
+                if (count($parts) > 1){
+                    foreach($parts as $part){
+                        if (!\BTRString::Contains($part,".")){
+                            //its not a file
+                            $fullPath .=$part."/";
+                        }	
+                    }
+                    if (!file_exists($fullPath)){
+                        mkdir($fullPath,0750,true);
+                    }
+                }
+            }
+            foreach($files as $file){
+                $serverPath = $this->packagesServer."vendor/gethitchhike/units/".$pkg."/";
+                $localPath = str_replace(".src",".php","./units/".str_replace($serverPath,"",$file));
+                $got = file_get_contents($file);
+                file_put_contents($localPath, $got);
+            }
+            if (file_exists("./units/".$pkg.".php")){
+                echo "Unit \"$pkg\" installed!\n";
+            }
+        }
+    }  
+};
+$this->dynamicMethods[]= "install";
+
+$this->remove = function(){
+    if ($this->args[1] == "help"){
+        return "Remove units \n";
+    }  
+    $packages = array_filter($this->args,function($p){
+        return !\BTRString::Contains($p,"hm.php") && $p !== "remove" && $p!= "packages";
+    });
+    foreach($packages as $pkg){	
+        if (\BTRString::Contains($pkg,"/")){
+            echo "Removing third party package using composer...\n";
+            exec("composer remove $pkg");
+        }
+        else{
+            if (file_exists("./units/".$pkg.".php.disabled")){
+                rename("./units/".$pkg.".php.disabled", "./units/".$pkg.".php");
+            }
+            if (file_exists("./units/".$pkg.".php")){
+                unlink("./units/".$pkg.".php");
+            }
+            else{
+                echo "Package \"$pkg\" not installed\n";
+                exit();
+            }
+            if (file_exists("./units/".$pkg.".hm")){
+                unlink("./units/".$pkg.".hm");
+            }
+            if (file_exists("./units/".$pkg."/")){
+                exec("rm ./units/".$pkg."/ -R");
+            }
+            if (!file_exists("./units/".$pkg.".php")){
+                echo "Unit \"$pkg\" removed.\n";
+            }
+        }
+    }  
+};
+$this->dynamicMethods[]= "remove";
+$this->unitupdate = function(){
+  if ($this->args[1] == "help"){
+        return "Update units only\n";
+    }
+    //Remember disabled units before update
+    $units = scandir("./units");
+    $disabledUnits = array();
+    $allUnits = array();
+    foreach($units as $value){
+        if (strpos($value,".php") !== false){
+            $name = str_replace(".php","",$value);
+            if (strpos($name,".disabled") !== false){
+                $rName = str_replace(".disabled", "", $name);
+                $disabledUnits[] =$rName ;
+                $allUnits[] = $rName;
+            }
+            else{
+                $allUnits[] = $name;
+            }
+        }
+    }	
+    foreach($disabledUnits as  $value){
+        $this->args[2] = $value;
+        call_user_func_array(array($this,"enable"),array());
+    }
+    foreach($allUnits as  $value){
+        $result = @file_get_contents($this->packagesServer."?/package/".$value."/");
+        if ($result !== false){
+            require "./units/".$value.".php";
+            $foo = new $value();
+            $localVersion = $foo->GetVersion();
+            $data = json_decode($result);
+            $remoteVersion = $data->Version;
+            $update = version_compare($remoteVersion,$localVersion);
+            if ($update === 1){
+                echo "Updating \"$value\"...\n";
+                $this->args = array("./hm.php","remove","$value");
+                call_user_func_array(array($this,"remove"),array());
+                $this->args = array("./hm.php","install","$value");
+                call_user_func_array(array($this,"install"),array());
+            }
+        }
+    }
+    foreach($disabledUnits as  $value){
+        $this->args[2] = $value;
+        call_user_func_array(array($this,"disable"),array());
+    }  
+};
+$this->dynamicMethods[]= "unitupdate";

@@ -1,0 +1,19 @@
+<?php
+
+class Packages{
+    public function GetFiles(){
+        return array("packages.php","packages.hm");
+    }
+    public function Requires(){
+        return array();
+    }
+    public function GetVersion(){
+        return "0.1";
+    }
+    public function GetName(){
+        return "Package management";
+    }
+    public function Run(){
+        //Do nothing.
+    }
+}
