@@ -35,6 +35,64 @@ $this->search = function(){
 };
 $this->dynamicMethods[]= "search";
 
+$this->info = function(){ 
+    if ($this->args[1] == "help"){
+        return "Get single package info\n";
+    }
+    $needle = $this->args[2] ?? null;
+    if (!is_null($needle)){
+
+       $path =  $this->packagesServer."?/package/".strtolower($needle)."/";
+        $opts = array(
+            'http'=>array(
+                'method'=>"GET",
+                'header'=>"User-Agent: hm"
+            )
+        );
+
+        $context = stream_context_create($opts);
+        $result = @file_get_contents($path,false,$context);
+        $data = json_decode($result);
+        if (is_null($data)){
+            echo "Package not found\n";
+        }
+        else{
+            $description =  $data->Description."\n";
+            $lastUpdate = date("d.m.Y H:i:s",$data->LastModified);
+            echo $needle." <".$data->Version.", ".$lastUpdate.">: ".$description;
+        }
+    }
+};
+$this->dynamicMethods[]= "info";
+
+$this->list = function(){ 
+    if ($this->args[1] == "help"){
+        return "List all packages from masterserver\n";
+    }
+
+    $path =  $this->packagesServer."?/list/";
+    $opts = array(
+        'http'=>array(
+            'method'=>"GET",
+            'header'=>"User-Agent: hm"
+        )
+    );
+
+    $context = stream_context_create($opts);
+    $result = @file_get_contents($path,false,$context);
+    $data = json_decode($result);
+    if (is_null($data)){
+        echo "Could not read data\n";
+    }
+    else{
+        foreach($data as $package){
+            echo $package."\n";
+        }
+    }
+    
+};
+$this->dynamicMethods[]= "list";
+
 $this->units = function(){
     if ($this->args[1] == "help"){
         return "Get installed units\n";
