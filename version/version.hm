@@ -1,9 +1,11 @@
 <?php
 $this->version = function(){
-	if ($this->args[1] == "help"){
-		return "Get version\n";
-	}
-	$version = trim(file_get_contents(".git/refs/heads/3"));
-	echo "hm.php version ".$version."\n";
+        if ($this->args[1] == "help"){
+                return "Get version\n";
+        }
+        $v = new Version();
+        $version = $v->GetVersion();
+        echo $version."\n";
 };
 $this->dynamicMethods[]= "version";
+
