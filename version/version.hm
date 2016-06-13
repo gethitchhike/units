@@ -3,9 +3,7 @@ $this->version = function(){
         if ($this->args[1] == "help"){
                 return "Get version\n";
         }
-        $v = new Version();
-        $version = $v->GetVersion();
-        echo $version."\n";
+	echo "0.4\n";
 };
 $this->dynamicMethods[]= "version";
 
