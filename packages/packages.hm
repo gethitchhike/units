@@ -103,7 +103,7 @@ $this->units = function(){
     foreach($units as $value){
         if (strpos($value,".php") !== false){
             $name = str_replace(".php","",$value);
-            include "./units/".$value;
+            include_once "./units/".$value;
             $className = $name;
             if (strpos($name,".disabled") !== false){
                 $className = str_replace(".disabled","",$name);
@@ -308,7 +308,7 @@ $this->unitupdate = function(){
     foreach($allUnits as  $value){
         $result = @file_get_contents($this->packagesServer."?/package/".$value."/");
         if ($result !== false){
-            require "./units/".$value.".php";
+            require_once "./units/".$value.".php";
             $foo = new $value();
             $localVersion = $foo->GetVersion();
             $data = json_decode($result);
