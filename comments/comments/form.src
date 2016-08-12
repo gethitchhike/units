@@ -41,7 +41,7 @@
   var commentbox = document.getElementById("comment");
   //Jump to comment box
   document.addEventListener('keydown', function(event) {      
-    if (document.activeElement.name !== "name" && document.activeElement.name !== "comment" && event.which === 67) {
+    if (document.activeElement.name !== "name" && document.activeElement.name !== "comment" && event.which === 67 && event.altKey) {
        event.preventDefault();
        commentbox.focus();
     }    
