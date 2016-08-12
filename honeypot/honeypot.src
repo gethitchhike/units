@@ -1,6 +1,6 @@
 <?php
 
-class honeypot implements IPreUnit{
+class honeypot implements IHeadUnit{
     public function GetFiles(){
         return array("honeypot.php");
     }
@@ -8,7 +8,7 @@ class honeypot implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.2";
+        return "0.3";
     }
     public function GetName(){
         return "Create a honeypot, disguise the system as old WordPress (4.1.0) and record requests to the fake backend /wp-admin/. Use \"cat <yourserverlog> | grep Honeypot\" for analysis. POST/ GET / SERVER Vars are stored in /wp-admin/ as *.json-files. The requester may be rick rolled.";
@@ -17,8 +17,11 @@ class honeypot implements IPreUnit{
         global $metatags;
         $metatags["generator"] = "WordPress 4.1.0";         
         $root = dirname(__DIR__);
+        echo "<link rel='stylesheet' id='jetpack_css-css' href='wp-includes/style.css' type='text/css' media='all'/>\n";
         if (!file_exists($root."/wp-admin/index.php")){
             mkdir ($root."/wp-admin");
+            mkdir($root."/wp-includes/");           
+            file_put_contents($root."/wp-includes/style.css",".body{}");
             file_put_contents($root."/wp-admin/index.php","<?",FILE_APPEND);
             file_put_contents($root."/wp-admin/index.php","php\n",FILE_APPEND);
             file_put_contents($root."/wp-admin/index.php","\$time=time(); error_log('Hitchhike Honeypot (\$time): Access from '.\$_SERVER['REMOTE_ADDR']);\n",FILE_APPEND);
