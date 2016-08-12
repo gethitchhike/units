@@ -8,10 +8,10 @@ class honeypot implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.1.1";
+        return "0.2";
     }
     public function GetName(){
-        return "Create a honeypot, disguise the system as old WordPress (4.1.0) and record requests to the fake backend /wp-admin/. Use \"cat <yourserverlog> | grep Honeypot\" for analysis. The requester may be rick rolled.";
+        return "Create a honeypot, disguise the system as old WordPress (4.1.0) and record requests to the fake backend /wp-admin/. Use \"cat <yourserverlog> | grep Honeypot\" for analysis. POST/ GET / SERVER Vars are stored in /wp-admin/ as *.json-files. The requester may be rick rolled.";
     }
     public function Run(){
         global $metatags;
@@ -21,7 +21,8 @@ class honeypot implements IPreUnit{
             mkdir ($root."/wp-admin");
             file_put_contents($root."/wp-admin/index.php","<?",FILE_APPEND);
             file_put_contents($root."/wp-admin/index.php","php\n",FILE_APPEND);
-            file_put_contents($root."/wp-admin/index.php","error_log('Hitchhike Honeypot: Access from '.\$_SERVER['REMOTE_ADDR']) ;?>\n",FILE_APPEND);
+            file_put_contents($root."/wp-admin/index.php","\$time=time(); error_log('Hitchhike Honeypot (\$time): Access from '.\$_SERVER['REMOTE_ADDR']);\n",FILE_APPEND);
+            file_put_contents($root."/wp-admin/index.php","file_put_contents(\$time.'.json',json_encode(array(\$_POST,\$_GET,\$_SERVER),JSON_PRETTY_PRINT));?>\n",FILE_APPEND);
             file_put_contents($root."/wp-admin/index.php","\n<iframe width='420' height='315' src='https://www.youtube.com/embed/IAISUDbjXj0?autoplay=1' frameborder='0' allowfullscreen></iframe>",FILE_APPEND);            
         }   
     }
