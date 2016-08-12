@@ -8,10 +8,10 @@ class honeypot implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.1";
+        return "0.1.1";
     }
     public function GetName(){
-        return "Create a honeypot, disguise the system as fucking old WordPress and record requests to the fake backend. Use cat <yourserverlog> | grep Honeypot for analysis.";
+        return "Create a honeypot, disguise the system as fucking old WordPress and record requests to the fake backend /wp-admin/. Use \"cat <yourserverlog> | grep Honeypot\" for analysis. The requester may be rick rolled.";
     }
     public function Run(){
         global $metatags;
