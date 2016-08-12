@@ -15,7 +15,7 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-    	return "0.4";
+    	return "0.4.1";
     }
     public function GetName(){
 		return "Skeleton";
@@ -147,12 +147,13 @@ class Skeleton implements IPreUnit{
             if (count($selectedPosts) == 1){
                 $post = array_shift($selectedPosts);
             }
-            else{
-                //TODO: 404
+            else{                
+                http_response_code(404);
+                global $translation;
                 $post = new \Post();
-                $post->Title = "Entry not found";
-                $post->Content="The media you searched for does not exists!";
-                $post->Date = strtotime("1970-01-01 00:00");
+                $post->Title = 404;
+                $post->Content= $translation["HTTP404"];
+                $post->Date = time();
                 $post->HTTPCode = 404;
             }
             $title = $post->Title. "-" .$blog->Name;
