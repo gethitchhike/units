@@ -11,11 +11,11 @@ class honeypot implements IPreUnit{
         return "0.1.1";
     }
     public function GetName(){
-        return "Create a honeypot, disguise the system as fucking old WordPress and record requests to the fake backend /wp-admin/. Use \"cat <yourserverlog> | grep Honeypot\" for analysis. The requester may be rick rolled.";
+        return "Create a honeypot, disguise the system as old WordPress (4.1.0) and record requests to the fake backend /wp-admin/. Use \"cat <yourserverlog> | grep Honeypot\" for analysis. The requester may be rick rolled.";
     }
     public function Run(){
         global $metatags;
-        $metatags["generator"] = "WordPress 4.1.0"; 
+        $metatags["generator"] = "WordPress 4.1.0";         
         $root = dirname(__DIR__);
         if (!file_exists($root."/wp-admin/index.php")){
             mkdir ($root."/wp-admin");
