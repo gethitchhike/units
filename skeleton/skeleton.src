@@ -15,7 +15,7 @@ class Skeleton implements IPreUnit{
         return array("Posts","i18n");
     }
     public function GetVersion(){
-    	return "0.4.1";
+    	return "0.4.2";
     }
     public function GetName(){
 		return "Skeleton";
@@ -130,6 +130,25 @@ class Skeleton implements IPreUnit{
             $posts = array_slice($posts,$offset,$currentSite*5.0);
             require_once(dirname(__DIR__)."/themes/".$this->theme."/template.php"); 
         },array("tag"));
+        $router->Route("/author/",function($php){
+            global $blog;
+            $p = new Posts();
+            $posts = array_filter($p->Run(),function($p) use ($php){
+                return !$p->Hidden && $php->get->author === str_replace("~","",$p->Author->Signature);
+            });    
+            $title = $blog->Name;
+            $innerContent = dirname(__DIR__)."/themes/".$this->theme."/latest.php";
+            $postCount = count($posts);
+            $currentSite = isset($php->get->site) ? (int)$php->get->site : 1;          
+            $allPageCount = $postCount/5.0;
+            $fullPageCount = ceil($postCount/5.0);
+            $min = 0;
+            $max = $fullPageCount;
+            //filter
+            $offset = $currentSite == 1 ? 0 : ($currentSite -1)*5.0;
+            $posts = array_slice($posts,$offset,$currentSite*5.0);
+            require_once(dirname(__DIR__)."/themes/".$this->theme."/template.php"); 
+        },array("author"));
         $router->Route("/post/",function($php){
             global $blog;
             $p = new Posts();
