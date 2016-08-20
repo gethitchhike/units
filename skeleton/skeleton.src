@@ -155,15 +155,16 @@ class Skeleton implements IPreUnit{
             $posts = $p->Run();
             $sites = $p->Run(".smd");
             $data = array_merge($sites,$posts);
-            $needle = urldecode($php->get->post);
+
+            //The path separator is \ instead of /, so no modifikation of the router is needed.
+            $needle = str_replace("\\","/", urldecode($php->get->post));
             $selectedPosts = array_filter($data,function($p) use ($php,$needle){
                 $r =  in_array($p->Filename, array($needle.".md",$needle.".smd"),true);
                 return $r;
             });
-            
             global $post;
             $post = null;
-            if (count($selectedPosts) == 1){
+            if (count($selectedPosts) != 0){
                 $post = array_shift($selectedPosts);
             }
             else{                
