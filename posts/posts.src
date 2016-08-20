@@ -12,6 +12,7 @@ class Post{
     public $Image;
     public $Tags;
     public $Hidden;
+    public $Tree;
 }
 class Posts implements IOnDemandUNit{
     public function GetFiles(){
@@ -21,19 +22,33 @@ class Posts implements IOnDemandUNit{
         return array();
     }
     public function GetVersion(){
-        return "0.4";
+        return "0.5";
     }
     public function GetName(){
         return "Posts";
     }
+    public function GetFileList($path,$filter = ".md"){
+        $list = array();
+        $files = scandir($path);
+        $blacklist = array(".","..");
+        foreach($files as $file){
+            if (!in_array($file,$blacklist)){
+                $dir = (is_dir($path.$file."/"));
+                if ($dir){
+                    $list = array_merge($this->GetFileList($path.$file."/"),$list);
+                }else if (\BTRString::EndsWith($file,$filter,true)){
+                    $list[] = $path.$file;
+                }
+            }
+        }
+        return $list;
+    }
     public function Run($filter = ".md"){
         global $blog;
-        $files = array_filter(scandir(__CONTENTPATH__),function($f) use ($filter){
-            return \BTRString::EndsWith($f,$filter,true);
-        });
+        $files = $this->GetFileList(__CONTENTPATH__,$filter); 
         $posts = array();
         foreach($files as $file){
-            $content =  file_get_contents(__CONTENTPATH__."/".$file);
+            $content =  file_get_contents($file);
             $post = new \Post();
 
             
@@ -49,7 +64,7 @@ class Posts implements IOnDemandUNit{
 
             }
             else{
-                $post->Date = filectime(__CONTENTPATH__."/".$file);
+                $post->Date = filectime($file);
             }
             $matches = array();
             //set post image
@@ -85,8 +100,9 @@ class Posts implements IOnDemandUNit{
             if (is_null($post->Author)){
                 $post->Author = $blog->Authors[0];
             }
-            $post->Filename = $file;
-            $post->WebFilename = urlencode(str_replace(array(".smd",".md"), "", $file));
+            $post->Filename = str_replace(__CONTENTPATH__,"",$file);
+            $post->Tree = strpos($post->Filename,"/") !== false ?  explode("/",dirname($post->Filename)) : array();
+            $post->WebFilename = urlencode(str_replace(array(".smd",".md"), "",str_replace("/","\\",$post->Filename)));
             $posts[] = $post;
         }
         usort($posts,function($a,$b){
