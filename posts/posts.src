@@ -22,7 +22,7 @@ class Posts implements IOnDemandUNit{
         return array();
     }
     public function GetVersion(){
-        return "0.5";
+        return "0.5.1";
     }
     public function GetName(){
         return "Posts";
@@ -35,7 +35,7 @@ class Posts implements IOnDemandUNit{
             if (!in_array($file,$blacklist)){
                 $dir = (is_dir($path.$file."/"));
                 if ($dir){
-                    $list = array_merge($this->GetFileList($path.$file."/"),$list);
+                    $list = array_merge($this->GetFileList($path.$file."/",$filter),$list);
                 }else if (\BTRString::EndsWith($file,$filter,true)){
                     $list[] = $path.$file;
                 }
