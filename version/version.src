@@ -19,7 +19,7 @@ class Version implements IPreUnit{
     public function Run(){
         global $metatags;
         if (!isset($metatags["generator"])){
-             $metatags["generator"] = "Hitchhike ".$this->GetVersion(). " '".$this->GetCodename()."'";   
+             $metatags["generator"] = "Hitchhike ".$this->GetVersion();   
         }
     }
 }
