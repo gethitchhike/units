@@ -3,7 +3,7 @@ $this->version = function(){
         if ($this->args[1] == "help"){
                 return "Get version\n";
         }
-	echo "0.4\n";
+	echo "0.4 'Almighty Bob'\n";
 };
 $this->dynamicMethods[]= "version";
 
