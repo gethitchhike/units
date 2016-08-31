@@ -8,7 +8,10 @@ class Version implements IPreUnit{
         return array();
     }
     public function GetVersion(){
-        return "0.4";
+        return "0.4.1";
+    }
+    public function GetCodename(){
+        return "Almighty Bob";
     }
     public function GetName(){
         return "Version String module. Please note: The hm.php version is not equal the Hitchhike version!";
@@ -16,7 +19,7 @@ class Version implements IPreUnit{
     public function Run(){
         global $metatags;
         if (!isset($metatags["generator"])){
-             $metatags["generator"] = "Hitchhike ".$this->GetVersion();   
+             $metatags["generator"] = "Hitchhike ".$this->GetVersion(). " '".$this->GetCodename()."'";   
         }
     }
 }
