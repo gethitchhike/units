@@ -1,5 +1,5 @@
 <?php
-class LoremIpsum{
+class LoremIpsum implements IUnit{
     public function GetFiles(){
         return array("loremipsum.php","loremipsum.hm");
     }
@@ -14,5 +14,8 @@ class LoremIpsum{
     }
     public function Run(){
         //this unit deos not have any action in the frontend
+    }
+    public function GetImplementation(){
+        return array();
     }
 }

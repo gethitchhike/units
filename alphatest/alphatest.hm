@@ -1,8 +1,0 @@
-<?php
-$this->sample = function(){
-	if ($this->args[1] == "help"){
-		return "Sample extension method\n";
-	}
-	echo "this is a sample extension method from alphatest-unit\n";
-};
-$this->dynamicMethods[]= "sample";

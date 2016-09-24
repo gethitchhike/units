@@ -1,6 +1,6 @@
 <?php
 
-class Maintenance{
+class Maintenance implements IUnit{
     public function GetFiles(){
         return array("maintenance.php","maintenance.hm");
     }
@@ -12,5 +12,8 @@ class Maintenance{
     }
     public function GetName(){
         return "Enables Maintenance mode for the complete installation.";
+    }
+    public function GetImplementation(){
+        return array();
     }
 }

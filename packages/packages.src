@@ -1,6 +1,6 @@
 <?php
 
-class Packages{
+class Packages implements IUnit{
     public function GetFiles(){
         return array("packages.php","packages.hm");
     }
@@ -15,6 +15,9 @@ class Packages{
     }
     public function Run(){
         //Do nothing.
+    }
+    public function GetImplementation(){
+        return array();
     }
 }
 
