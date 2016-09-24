@@ -1,6 +1,6 @@
 <?php
 
-class AShare implements IPostUnit{
+class AShare implements IUnit{
     public function GetFiles(){
         return array("ashare.php");
     }
@@ -30,5 +30,8 @@ class AShare implements IPostUnit{
           echo "<li><a href='".$href."'><i class='".$key."'></i></a></li>";
       }
       echo "</ul>";
+    }
+    public function GetImplementation(){
+        return array("IPostUnit");
     }
 }

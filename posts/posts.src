@@ -14,7 +14,7 @@ class Post{
     public $Hidden;
     public $Tree;
 }
-class Posts implements IOnDemandUNit{
+class Posts implements IUnit{
     public function GetFiles(){
         return array("posts.php","posts.hm");
     }
@@ -123,5 +123,8 @@ class Posts implements IOnDemandUNit{
     private function GetPostContent($content){
         $lines = explode("\n",$content);
         return str_replace($lines[0],"",$content);
+    }
+    public function GetImplementation(){
+        return array("IOnDemandUNit");
     }
 }

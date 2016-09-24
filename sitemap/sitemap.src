@@ -1,6 +1,6 @@
 <?php
 
-class Sitemap implements IPreUnit{
+class Sitemap implements IUnit{
     public function GetFiles(){
         return array("sitemap.php","sitemap.hm");
     }
@@ -9,6 +9,9 @@ class Sitemap implements IPreUnit{
     }
     public function GetVersion(){
         return "0.1";
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
     public function GetName(){
         return "Sitemap module";

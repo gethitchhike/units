@@ -1,5 +1,5 @@
 <?php
-class Meta implements IHeadUnit{
+class Meta implements IUnit{
     public function GetFiles(){
         return array("meta.php");
     }
@@ -22,5 +22,8 @@ class Meta implements IHeadUnit{
         foreach($metatags as $key => $value){
             echo "<meta name='".$key."' value='".$value."'>\n";
         }
+    }
+    public function GetImplementation(){
+        return array("IHeadUnit");
     }
 }

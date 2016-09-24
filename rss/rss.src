@@ -1,6 +1,6 @@
 <?php
 
-class RSS implements IPreUnit{
+class RSS implements IUnit{
     public function GetFiles(){
         return array("rss.php");
     }
@@ -12,6 +12,9 @@ class RSS implements IPreUnit{
     }
     public function GetName(){
         return "RSS Unit";
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
     public function Run(){
         global $router;

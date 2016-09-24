@@ -1,5 +1,5 @@
 <?php
-class Comments implements IPostUnit{
+class Comments implements IUnit{
     public function GetFiles(){
         return array("comments.php","comments/form.php","comments/comments.db");
     }
@@ -82,5 +82,8 @@ class Comments implements IPostUnit{
       require_once __DIR__."/comments/form.php";
       $db = null; 
        
+    }
+    public function GetImplementation(){
+        return array("IPostUnit");
     }
 }

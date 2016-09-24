@@ -1,6 +1,6 @@
 <?php
 
-class Import implements IPreUnit{
+class Import implements IUnit{
     public function GetFiles(){
         return array("import.php","wordpress.hm");
     }
@@ -15,5 +15,8 @@ class Import implements IPreUnit{
     }
     public function Run(){
         //nothing, this unit is for hm extension only
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
 }

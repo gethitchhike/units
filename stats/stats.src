@@ -1,6 +1,6 @@
 <?php
 
-class Stats implements IPreUnit{
+class Stats implements IUnit{
     public function GetFiles(){
         return array("stats.php","stats.hm");
     }
@@ -9,6 +9,9 @@ class Stats implements IPreUnit{
     }
     public function GetVersion(){
         return "0.3";
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
     public function GetName(){
         return "Record privacy friendly statistics. Unit counts hits only.";

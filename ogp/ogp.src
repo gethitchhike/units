@@ -1,5 +1,5 @@
 <?php
-class OGP implements IHeadUnit{
+class OGP implements IUnit{
     public function GetFiles(){
         return array("ogp.php");
     }
@@ -61,5 +61,8 @@ class OGP implements IHeadUnit{
                 }
             }
         }
+    }
+    public function GetImplementation(){
+        return array("IHeadUnit");
     }
 }

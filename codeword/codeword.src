@@ -1,6 +1,6 @@
 <?php
 
-class CodeWord implements IPostUnit{
+class CodeWord implements IUnit{
     public function GetFiles(){
         return array("codeword.php");
     }
@@ -25,6 +25,9 @@ class CodeWord implements IPostUnit{
         }
       }
       echo "</div>";
+    }
+    public function GetImplementation(){
+        return array("IPostUnit");
     }
 }
 

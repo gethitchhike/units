@@ -1,6 +1,6 @@
 <?php
 
-class Ad implements ISideUnit{
+class Ad implements IUnit{
     public function GetFiles(){
         return array("ad.hm","ad.src");
     }
@@ -19,6 +19,8 @@ class Ad implements ISideUnit{
             $config = json_decode(file_get_contents("./content/ad.json"));
             echo $config->Content;
         }
-
+    }
+    public function GetImplementation(){
+        return array("ISideUnit");
     }
 }

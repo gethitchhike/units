@@ -13,7 +13,7 @@
 ?>
 <?php
 
-class ContactForm implements IPreUnit{
+class ContactForm implements IUnit{
     public function GetFiles(){
         return array("contactform.php","contactform.hm");
     }
@@ -53,6 +53,9 @@ class ContactForm implements IPreUnit{
             });
         }
         
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
 }
 

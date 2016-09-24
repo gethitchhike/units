@@ -1,6 +1,6 @@
 <?php
 
-class Skeleton implements IPreUnit{
+class Skeleton implements IUnit{
     private $theme ="simple";
     public function __construct(){
         global $blog;
@@ -10,6 +10,9 @@ class Skeleton implements IPreUnit{
     }
     public function GetFiles(){
         return array("skeleton.php");
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
     public function Requires(){
         return array("Posts","i18n");

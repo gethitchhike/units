@@ -1,5 +1,5 @@
 <?php
-class https implements IPreUnit{
+class https implements IUnit{
     public function GetFiles(){
         return array("https.php");
     }
@@ -15,5 +15,8 @@ class https implements IPreUnit{
     public function Run(){
         header('Location: https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], true, 301);
         die();  
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
 }

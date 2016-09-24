@@ -1,6 +1,6 @@
 <?php
 
-class TagCloud implements ISideUnit{
+class TagCloud implements IUnit{
     public function GetFiles(){
         return array("tagcloud.php");
     }
@@ -9,6 +9,9 @@ class TagCloud implements ISideUnit{
     }
     public function GetVersion(){
         return "0.1";
+    }
+    public function GetImplementation(){
+        return array("ISideUnit");
     }
     public function GetName(){
         return "Displays a tag cloud based on the post tags";

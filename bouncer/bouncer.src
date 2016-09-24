@@ -1,5 +1,5 @@
 <?php
-class Bouncer implements IPreUnit{
+class Bouncer implements IUnit{
     public function GetFiles(){
         return array("bouncer.php");
     }
@@ -33,5 +33,8 @@ class Bouncer implements IPreUnit{
             }
         }
         
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
 }

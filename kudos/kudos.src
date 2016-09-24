@@ -1,6 +1,6 @@
 <?php
 
-class Kudos implements IPostUnit{
+class Kudos implements IUnit{
 		public function GetFiles(){
 			return array("kudos.php");
 		}
@@ -78,5 +78,8 @@ class Kudos implements IPostUnit{
 			echo "</div>";
 
 			$db = null;
+		}
+		public function GetImplementation(){
+			return array("IPostUnit");
 		}
 }

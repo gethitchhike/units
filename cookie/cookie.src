@@ -1,6 +1,6 @@
 <?php
 
-class Cookie implements IPrePostUnit{
+class Cookie implements IUnit{
     public function GetFiles(){
         return array("cookie.php");
     }
@@ -35,5 +35,8 @@ class Cookie implements IPrePostUnit{
             hideLink();
         }
         </script>";
+    }
+    public function GetImplementation(){
+        return array("IPrePostUnit");
     }
 }

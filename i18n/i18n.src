@@ -1,5 +1,5 @@
 <?php
-class i18n implements IPreUnit{
+class i18n implements IUnit{
     public function GetFiles(){
         return array("i18n.php");
     }
@@ -49,5 +49,8 @@ class i18n implements IPreUnit{
         else{
             $translation =  $vars[$blog->Language];
         }
+    }
+    public function GetImplementation(){
+        return array("IPreUnit");
     }
 }

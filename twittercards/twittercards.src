@@ -1,5 +1,5 @@
 <?php
-class TwitterCards implements IHeadUnit{
+class TwitterCards implements IUnit{
     public function GetFiles(){
         return array("twittercards.php");
     }
@@ -8,6 +8,9 @@ class TwitterCards implements IHeadUnit{
     }
     public function GetVersion(){
     	return "0.1";
+    }
+	public function GetImplementation(){
+        return array("IHeadUnit");
     }
 	public function GetName(){
 		return "Twitter Cards ";
