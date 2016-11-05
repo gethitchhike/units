@@ -1,0 +1,114 @@
+<?php
+$this->implementations = function(){
+	if ($this->args[1] == "help"){
+		return "List units by their implementations\n";
+	}
+	$units = scandir("./units");
+	foreach($units as $key => $value){
+			if (strpos($value,".php") !== false){
+					$name = str_replace(".php","",$value);
+					include_once "./units/".$value;
+					$className = $name;
+					if (strpos($name,".disabled") !== false){
+							$className = str_replace(".disabled","",$name);
+							$name = str_replace(".disabled"," <disabled>",$name);
+					}
+					$foo = new $className();
+					$index++;
+					$implementations = $foo->GetImplementation();
+					if (count($implementations) !==  0){
+						echo "[".$index."] ".$name ." ".$foo->GetVersion().": ".strtolower(implode($implementations,','))."\n";
+					}
+			}
+	}
+};
+$this->dynamicMethods[]= "implementations";
+$this->sort = function(){
+		if ($this->args[1] == "help"){
+			return "Sort units by implementation\n";
+		}
+	  $implementation = "";
+		if (!isset($this->args[2])){
+			echo "No argument set\n";
+	        return null;
+		}else{
+        $implementation = $this->args[2];
+    }
+		$units = scandir("./units");
+    $index = 0;
+    $list = array();
+
+    echo "Use 'quit' or 'exit' to abort\n";
+    $path = __DIR__."/".$implementation.".playlist";
+    if (file_exists($path)){
+        echo "Using playlist $path.\n";
+        $data = file($path);
+        foreach($data as $value){
+            $value = trim($value);
+            include_once "./units/".$value.".php";
+            $className = $value;
+            $index++;
+            $foo = new $className();
+            echo "[".$index."] ".$value ." ".$foo->GetVersion()."\n";
+            $list[$index] = $value;
+        }
+    }else{
+				if (count($units) === 0){
+					echo "Unit \"$implementation\" has not units.\n";
+				}
+        foreach($units as $key => $value){
+            if (strpos($value,".php") !== false){
+                $name = str_replace(".php","",$value);
+                include_once "./units/".$value;
+                $className = $name;
+                if (strpos($name,".disabled") !== false){
+                    $className = str_replace(".disabled","",$name);
+                    $name = str_replace(".disabled"," <disabled>",$name);
+                }
+                $foo = new $className();
+                if (count(preg_grep("/$implementation/i",$foo->GetImplementation()))){
+                    $index++;
+                    echo "[".$index."] ".$name ." ".$foo->GetVersion()."\n";
+                    $list[$index] = $name;
+                }
+            }
+        }
+    }
+
+    $input = "";
+    $index1 = -1;
+    $index2 = -1;
+    do{
+        $input = readline();
+        if (is_numeric($input) && $input > 0 && $input <= count($list)){
+            if ($index1 === -1){
+                $index1 = $input;
+                echo "Swap candidate 1: ".$list[$input].".\n";
+            }
+            else if ($index2 === -1 && $index1 !== -1){
+                $index2 = $input;
+                echo "Swap candidate 2: ".$list[$input].".\n";
+            }
+        }
+        else{
+            $input = strtolower($input); //typo prevention
+        }
+        if ($index2 !== -1 && $index1 !== -1){
+            echo $list[$index1]." will be swapped with ".$list[$index2].".\n";
+            //swap
+            $tmp = $list[$index1];
+            $list[$index1] = $list[$index2];
+            $list[$index2] = $tmp;
+            //create playlist
+            $content = "";
+            foreach ($list as $key => $value) {
+                $content .= $value."\n";
+            }
+            $ok = file_put_contents($path,$content) > 0;
+            echo "Created playlist ".$path.": ".($ok ? "yes": "no")."\n";
+            $index1 = -1;
+            $index2 = $index1;
+        }
+    }while($input !== "exit" && $input !== "quit");
+};
+$this->dynamicMethods[]= "sort";
